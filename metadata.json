@@ -1,0 +1,8 @@
+{
+  "description": "My TV Star - A professional TV studio simulation game where you earn $5 per 10 minutes. Playable for ages 5+ with a recommended age of 8+. Parental control for under 18s.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "name": "My TV Star"
+}
