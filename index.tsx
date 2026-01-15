@@ -88,7 +88,10 @@ import {
   Shapes,
   Piano,
   Target,
-  SmartphoneNfc
+  SmartphoneNfc,
+  Apple,
+  Bot,
+  Fan
 } from 'lucide-react';
 
 // --- Constants & Types ---
@@ -568,8 +571,8 @@ Join the Network today!`;
     setIsGeneratingImage(true);
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const s = tempStar as CharacterProfile;
-    // Modified prompt to focus on 'Cartoon Network series' art style
-    const prompt = `Stylized 2D character design in the iconic Cartoon Network art style, clean bold outlines, vibrant flat colors, cel-shaded, expressive features. Character: ${s.userName}, a ${s.role}. Physical specs: ${s.appearance.skintone} skin, ${s.appearance.bodyHeight} height, ${s.appearance.bodyShape} build. Wearing: ${s.appearance.top} and ${s.appearance.bottom} with ${s.appearance.footwear}. Bio: ${s.bio || 'A rising star.'} Pose: ${s.appearance.pose}. Environment: ${s.shootingLocation}. Features: ${s.appearance.studioFurniture} (Positioned: ${s.studioTransforms.furniture.x}, ${s.studioTransforms.furniture.y}, Scale: ${s.studioTransforms.furniture.scale}) and ${s.appearance.studioProps} (Positioned: ${s.studioTransforms.props.x}, ${s.studioTransforms.props.y}, Scale: ${s.studioTransforms.props.scale}). Lighting: ${s.appearance.studioLighting}. Style: professional vector-style character sheet, high quality 2D animation aesthetic.`;
+    // Modified prompt to focus on 'Cartoon Network series' art style with specific era references
+    const prompt = `Stylized 2D character design in the iconic Cartoon Network art style (like Dexter's Laboratory, Powerpuff Girls, or Adventure Time), clean bold outlines, vibrant flat colors, cel-shaded, expressive features. Character: ${s.userName}, a ${s.role}. Physical specs: ${s.appearance.skintone} skin, ${s.appearance.bodyHeight} height, ${s.appearance.bodyShape} build. Wearing: ${s.appearance.top} and ${s.appearance.bottom} with ${s.appearance.footwear}. Bio: ${s.bio || 'A rising star.'} Pose: ${s.appearance.pose}. Environment: ${s.shootingLocation}. Features: ${s.appearance.studioFurniture} (Positioned: ${s.studioTransforms.furniture.x}, ${s.studioTransforms.furniture.y}, Scale: ${s.studioTransforms.furniture.scale}) and ${s.appearance.studioProps} (Positioned: ${s.studioTransforms.props.x}, ${s.studioTransforms.props.y}, Scale: ${s.studioTransforms.props.scale}). Lighting: ${s.appearance.studioLighting} (Positioned: ${s.studioTransforms.lighting.x}, ${s.studioTransforms.lighting.y}). Style: professional vector-style character sheet, high quality 2D animation aesthetic.`;
     
     try {
       const response = await ai.models.generateContent({
@@ -1271,15 +1274,15 @@ Join the Network today!`;
                <p className="text-xs font-black uppercase tracking-[0.4em] text-slate-500">Available across all sectors</p>
                <div className="flex flex-wrap justify-center gap-6">
                   <div className="flex flex-col items-center gap-2 group cursor-pointer">
-                    <div className="bg-white text-black p-4 border-4 border-black hover:bg-[#FF0080] hover:text-white transition-all"><Smartphone className="w-12 h-12" /></div>
+                    <div className="bg-white text-black p-4 border-4 border-black hover:bg-[#FF0080] hover:text-white transition-all"><Apple className="w-12 h-12" /></div>
                     <span className="text-[10px] font-black uppercase">iOS App</span>
                   </div>
                   <div className="flex flex-col items-center gap-2 group cursor-pointer">
-                    <div className="bg-white text-black p-4 border-4 border-black hover:bg-[#00FF7F] hover:text-white transition-all"><SmartphoneNfc className="w-12 h-12" /></div>
+                    <div className="bg-white text-black p-4 border-4 border-black hover:bg-[#00FF7F] hover:text-white transition-all"><Bot className="w-12 h-12" /></div>
                     <span className="text-[10px] font-black uppercase">Android</span>
                   </div>
                   <div className="flex flex-col items-center gap-2 group cursor-pointer">
-                    <div className="bg-white text-black p-4 border-4 border-black hover:bg-[#FFFF00] hover:text-white transition-all"><Cpu className="w-12 h-12" /></div>
+                    <div className="bg-white text-black p-4 border-4 border-black hover:bg-[#FFFF00] hover:text-white transition-all"><Fan className="w-12 h-12" /></div>
                     <span className="text-[10px] font-black uppercase">HarmonyOS</span>
                   </div>
                </div>
