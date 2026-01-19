@@ -1,5 +1,5 @@
 {
-  "description": "My TV Star - A professional TV studio simulation game where you earn $5 each 10 minutes gameplay. Playable for age 5 years and above with recommended age 8 years and above. Parental control for under 18s.",
+  "description": "My TV Star - A professional TV studio simulation game where you earn $5 each 10 minutes gameplay. Playable for age 3 years and above. Parental control for under 18s. Minimum 2GB RAM required, 4GB RAM recommended for optimal experience.",
   "requestFramePermissions": [
     "camera",
     "microphone"

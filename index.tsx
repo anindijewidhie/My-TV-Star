@@ -1,65 +1,56 @@
-
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
 import { GoogleGenAI, Type } from "@google/genai";
 import { 
   Tv, 
-  Mic2, 
   Monitor, 
-  Camera, 
   Globe, 
   Loader2, 
-  Move, 
-  Video, 
-  Armchair, 
-  BoxSelect, 
-  Lamp, 
-  History, 
-  Share2, 
   PlusCircle, 
-  Music2, 
-  Piano, 
   Bot, 
   Maximize2, 
-  RotateCw, 
-  Grip, 
   Signal,
   Shield,
-  MapPin,
-  ChevronRight,
-  UserPlus,
   Play,
-  Layers,
   Zap,
   DollarSign,
   Sun,
   Moon,
-  MessageSquare,
-  BarChart3,
-  Clapperboard,
-  FastForward,
-  Info,
   Settings2,
   Edit3,
   Trash2,
   CheckCircle2,
-  Clock,
-  Music,
-  Disc,
   Activity,
-  Maximize,
-  Ratio as AspectIcon,
   Sparkles,
-  Search,
-  Eye,
   Volume2,
-  Wand2,
-  Users,
-  Grid3X3,
-  Palette,
-  Image as ImageIcon,
-  Dices,
-  PenTool
+  Smartphone,
+  Gamepad2,
+  Cpu,
+  Trophy,
+  HardDrive,
+  Accessibility,
+  Ear,
+  Keyboard as KeyboardIcon,
+  PieChart,
+  Heart,
+  Coins,
+  ArrowRight,
+  QrCode,
+  CreditCard,
+  Wallet,
+  Banknote,
+  X,
+  MousePointer2,
+  ShieldCheck,
+  SmartphoneNfc,
+  Cast,
+  LayoutGrid,
+  Star,
+  List,
+  BarChart4,
+  Hash,
+  ChevronRight,
+  Info
 } from 'lucide-react';
 
 // --- Internationalization (i18n) ---
@@ -69,6 +60,7 @@ const TRANSLATIONS: Record<string, any> = {
     tagline: "THE ULTIMATE BROADCASTING SIMULATION", 
     startSim: "START SIMULATION", 
     login: "LOGIN", 
+    enterHub: "ENTER HUB",
     identitySync: "IDENTITY SYNC", 
     enterTerminal: "ENTER TERMINAL", 
     hub: "HUB", 
@@ -95,31 +87,52 @@ const TRANSLATIONS: Record<string, any> = {
     resolution: "RESOLUTION",
     enhance: "ENHANCE WITH AI",
     editStar: "EDIT TALENT",
-    unlimited: "UNLIMITED MODE"
+    unlimited: "UNLIMITED MODE",
+    platformAvailability: "PLATFORM DEPLOYMENT STATUS",
+    optimized: "OPTIMIZED FOR ALL DEVICES",
+    rewardTitle: "REWARD ENGINE ACTIVE",
+    rewardDesc: "Earn $5.00 every 10 minutes of network uptime. Your talent, your empire, your revenue.",
+    unlimitedTitle: "UNLIMITED CREATIVITY",
+    unlimitedDesc: "Customizable everything. Any body size, any style, any studio. Powered by Gemini AI.",
+    systemReqs: "SYSTEM REQUIREMENTS",
+    ramMin: "2GB RAM MINIMUM",
+    ramRec: "4GB RAM RECOMMENDED",
+    accessibility: "ACCESSIBILITY HUB",
+    voiceGuidance: "VOICE GUIDANCE",
+    closedCaptions: "CLOSED CAPTIONS",
+    largeText: "ENHANCED LEGIBILITY",
+    kbShortcuts: "KEYBOARD SHORTCUTS",
+    narratorOn: "Narrator Active. Hover over elements for audio guidance.",
+    narratorOff: "Narrator Disabled.",
+    financialTitle: "FINANCIAL TRANSPARENCY",
+    fundingModel: "FUNDING DISTRIBUTION MODEL",
+    playerPayouts: "PLAYER PAYOUTS",
+    maintenance: "MAINTENANCE",
+    development: "DEVELOPMENT",
+    siteOwner: "PLATFORM OWNER",
+    donationInfo: "My TV Star is funded by community donations. Here is how every dollar is distributed to keep the network alive:",
+    donationPageTitle: "NETWORK SUPPORT",
+    supportTagline: "FUEL THE BROADCAST EMPIRE",
+    donateNow: "SEND DONATION",
+    selectTier: "SELECT CONTRIBUTION TIER",
+    thankYou: "THANK YOU FOR YOUR SUPPORT!",
+    supportDesc: "Your contributions ensure we can maintain a high-quality global network for all stars.",
+    paymentTerminal: "PAYMENT TERMINAL",
+    scanQr: "SCAN UNIVERSAL QR CODE",
+    universalSupport: "SUPPORTS ALL BANKS & E-WALLETS",
+    allCurrencies: "MULTI-CURRENCY AUTO-CONVERSION",
+    accountDetails: "ACCOUNT DETAILS",
+    bankName: "PAYPAL (dhea_wasisto@yahoo.com)",
+    accountNo: "E-WALLET (+628567239000)",
+    confirmPayment: "CONFIRM DEPOSIT",
+    processing: "PROCESSING TRANSACTION...",
+    customAmount: "CUSTOM AMOUNT",
+    enterAmount: "ENTER USD AMOUNT",
+    wallets: "GOPAY / OVO / SHOPEEPAY"
   },
-  id: { appTitle: "BINTANG TV SAYA", settings: "PENGATURAN", language: "BAHASA", hub: "PUSAT", signTalent: "KONTRAK TALENTA BARU", treasury: "PERBENDAHARAAN" },
-  'zh-Hant': { appTitle: "我的電視明星", settings: "設置", language: "語言", hub: "中心", signTalent: "簽約新藝人", treasury: "金庫" },
-  'zh-Hans': { appTitle: "我的电视明星", settings: "设置", language: "语言", hub: "中心", signTalent: "签约新艺人", treasury: "金库" },
-  es: { appTitle: "MI ESTRELLA DE TV", settings: "AJUSTES", language: "IDIOMA", hub: "CENTRO", signTalent: "CONTRATAR TALENTO", treasury: "TESORERÍA" },
-  fr: { appTitle: "MA STAR DE LA TÉLÉ", settings: "PARAMÈTRES", language: "LANGUE", hub: "ACCUEIL", signTalent: "SIGNER UN TALENT", treasury: "TRÉSORERIE" },
-  pt: { appTitle: "MINHA ESTRELA DA TV", settings: "CONFIGURAÇÕES", language: "IDIOMA", hub: "HUB", signTalent: "CONTRATAR TALENTO", treasury: "TESOURARIA" },
-  ru: { appTitle: "МОЯ ТЕЛЕЗВЕЗДА", settings: "НАСТРОЙКИ", language: "ЯЗЫК", hub: "ХАБ", signTalent: "ПОДПИСАТЬ ТАЛАНТ", treasury: "КАЗНАЧЕЙСТВО" },
-  ar: { appTitle: "نجم التلفزيون الخاص بي", settings: "الإعدادات", language: "اللغة", hub: "المحور", signTalent: "توقيع موهبة جديدة", treasury: "الخزينة" },
-  hi: { appTitle: "मेरा टीवी स्टार", settings: "सेटिंग्स", language: "भाषा", hub: "हब", signTalent: "नई प्रतिभा साइन करें", treasury: "खजाना" },
-  bn: { appTitle: "আমার টিভি তারকা", settings: "সেটিংস", language: "ভাষা", hub: "হাব", signTalent: "নতুন প্রতিভা স্বাক্ষর করুন", treasury: "কোষাগار" },
-  ur: { appTitle: "میرا ٹی وی اسٹار", settings: "ترتیبات", language: "زبان", hub: "مرکز", signTalent: "نیا ٹیلنٹ سائن کریں", treasury: "خزانہ" },
-  ja: { appTitle: "マイ・TV・スター", settings: "設定", language: "言語", hub: "ハブ", signTalent: "新しいスターと契約", treasury: "財務局" },
-  ko: { appTitle: "마이 TV 스타", settings: "설정", language: "언어", hub: "허브", signTalent: "새로운 인재 영입", treasury: "재무" }
 };
 
-const LANGUAGES_LIST = [
-  { code: 'en', label: 'ENGLISH' }, { code: 'id', label: 'BAHASA INDONESIA' }, { code: 'zh-Hant', label: '繁體中文' }, { code: 'zh-Hans', label: '简体中文' },
-  { code: 'es', label: 'ESPAÑOL' }, { code: 'fr', label: 'FRANÇAIS' }, { code: 'pt', label: 'PORTUGUÊS' }, { code: 'ru', label: 'РУССКИЙ' },
-  { code: 'ar', label: 'العربية' }, { code: 'hi', label: 'हिन्दी' }, { code: 'bn', label: 'বাংলা' }, { code: 'ur', label: 'اردو' },
-  { code: 'ja', label: '日本語' }, { code: 'ko', label: '한국어' }
-];
-
-type View = 'home' | 'login' | 'onboarding' | 'customization' | 'dashboard' | 'settings' | 'roster';
+type View = 'home' | 'login' | 'onboarding' | 'customization' | 'dashboard' | 'settings' | 'roster' | 'donation';
 
 interface StarAppearance {
   ageGroup: string; gender: string; skintone: string; bodySize: string; hairstyle: string; hairColor: string; eyeColor: string; pose: string; top: string; bottom: string; footwear: string; makeup: string; headwear: string; accessories: string; primaryColor: string; secondaryColor: string; imageUrl?: string; studioFurniture: string; studioProps: string; studioLighting: string; studioBackdrop: string; studioSound: string; studioFX: string; studioAudience: string; studioFlooring: string; studioMonitors: string; cameraAngle: string; studioTheme: string; aspectRatio: string; imageSize: string; groundingEnabled: boolean;
@@ -129,52 +142,42 @@ interface CharacterProfile {
   id: string; userName: string; role: string; bio: string; popularity: number; level: number; earnings: number; appearance: StarAppearance;
 }
 
-interface GameState {
-  language: string; money: number; roster: CharacterProfile[]; activeStarId: string | null; currentProducer: string; tutorialSeen: boolean; baseEarningAmount: number; baseEarningIntervalMs: number; theme: 'dark' | 'light';
+interface AccessibilitySettings {
+  voiceGuidance: boolean;
+  closedCaptions: boolean;
+  largeText: boolean;
+  kbShortcuts: boolean;
 }
 
-const INITIAL_INSPIRATIONS: Record<string, string[]> = {
-  ageGroup: ["Young Adults (18-24)", "Teenagers (13-17)", "Adults (25-44)"],
-  gender: ['Male', 'Female', 'Non-Binary', 'Androgynous'],
-  skintone: ["Warm", "Neutral", "Cool", "Olive"],
-  bodySize: ["Petite", "Slim", "Average", "Athletic", "Curvy", "Plus Size", "Muscular"],
-  pose: ['Dynamic Hero Pose', 'Expressive Laugh', 'Dramatic Finger Point', 'Stage Bow', 'Confident Lean'],
-  top: ['Heroic Cape Jacket', 'Retro Cartoon Hoodie', 'Neon Studio Vest'],
-  bottom: ['Wide-Leg Cartoon Pants', 'High-Waist Space Leggings', 'Cargo Utility Shorts'],
-  footwear: ['Oversized Red Boots', 'Winged Sneakers', 'Electric High-Tops'],
-  makeup: ['Star Eye Decal', 'Glowing Face Lines', 'Bold Comic Contouring'],
-  headwear: ['Backward Star Cap', 'Cyber-Antennae Headband', 'Glowing Crown'],
-  accessories: ['Holographic Scarf', 'Cyber-Goggles', 'Expressive Cape'],
-  hairstyle: ['Spiky Hero Hair', 'Gravity-Defying Curls', 'Neon Buzz Cut'],
-  hairColor: ['Neon Pink', 'Electric Blue', 'Jet Black', 'Pure White'],
-  eyeColor: ['Crimson', 'Cyan', 'Lime', 'Gold'],
-  primaryColor: ['Magenta', 'Cyan', 'Yellow', 'Lime'],
-  studioTheme: ['Cyberpunk', 'Retro TV', 'Clean Minimal', 'Gothic Cathedral'],
-  studioFurniture: ['Floating Holographic Podium', 'Retro Neon Desk', 'Victorian Armchair'],
-  studioProps: ['Oversized Silver Microphone', 'Floating Teleprompter Droid'],
-  studioLighting: ['Vibrant Multi-Color Spots', 'Cool Blue Key Lights'],
-  studioBackdrop: ['City Rooftop Skyline', 'Sci-Fi Control Room', 'Floating Cloud Kingdom'],
-  studioSound: ['High-Tech Lavalier', 'Professional Boom Mic'],
-  studioFX: ['Floating Digital Particles', 'Dry Ice Fog'],
-  studioAudience: ['Empty Studio', 'Live Cheering Crowd'],
-  studioFlooring: ['Polished Chrome', 'High-Gloss Hardwood'],
-  studioMonitors: ['CRT TV Wall', 'Floating Holographic Screens'],
-  cameraAngle: ['Standard Mid-Shot', 'Low Angle Heroic', 'High Angle Cinematic'],
-  aspectRatio: ["1:1", "4:3", "16:9", "9:16"],
-  imageSize: ["1K", "2K", "4K"]
-};
+interface GameState {
+  language: string; 
+  money: number; 
+  roster: CharacterProfile[]; 
+  activeStarId: string | null; 
+  currentProducer: string; 
+  tutorialSeen: boolean; 
+  baseEarningAmount: number; 
+  baseEarningIntervalMs: number; 
+  theme: 'dark' | 'light';
+  accessibility: AccessibilitySettings;
+}
 
 const DEFAULT_APPEARANCE: StarAppearance = {
-  ageGroup: 'Young Adults (18-24)', gender: 'Non-Binary', skintone: "Neutral", bodySize: 'Average', hairstyle: 'Spiky Hero Hair', hairColor: 'Neon Pink', eyeColor: 'Cyan', pose: 'Dynamic Hero Pose', top: 'Retro Cartoon Hoodie', bottom: 'Wide-Leg Cartoon Pants', footwear: 'Oversized Red Boots', makeup: 'Star Eye Decal', headwear: 'Backward Star Cap', accessories: 'Cyber-Goggles', primaryColor: 'Magenta', secondaryColor: 'Cyan', studioFurniture: 'Floating Holographic Podium', studioProps: 'Oversized Silver Microphone', studioLighting: 'Vibrant Multi-Color Spots', studioBackdrop: 'City Rooftop Skyline', studioSound: 'High-Tech Lavalier', studioFX: 'Floating Digital Particles', studioAudience: 'Empty Studio', studioFlooring: 'Polished Chrome', studioMonitors: 'CRT TV Wall', cameraAngle: 'Standard Mid-Shot', studioTheme: 'Cyberpunk', aspectRatio: '1:1', imageSize: '1K', groundingEnabled: false
+  ageGroup: 'Younger Adults (18-24 years old)', gender: 'Non-Binary', skintone: "Neutral", bodySize: 'Average', hairstyle: 'Spiky Hero Hair', hairColor: 'Neon Pink', eyeColor: 'Cyan', pose: 'Dynamic Hero Pose', top: 'Retro Cartoon Hoodie', bottom: 'Wide-Leg Cartoon Pants', footwear: 'Oversized Red Boots', makeup: 'Star Eye Decal', headwear: 'Backward Star Cap', accessories: 'Cyber-Goggles', primaryColor: 'Magenta', secondaryColor: 'Cyan', studioFurniture: 'Floating Holographic Podium', studioProps: 'Oversized Silver Microphone', studioLighting: 'Vibrant Multi-Color Spots', studioBackdrop: 'City Rooftop Skyline', studioSound: 'High-Tech Lavalier', studioFX: 'Floating Digital Particles', studioAudience: 'Empty Studio', studioFlooring: 'Polished Chrome', studioMonitors: 'CRT TV Wall', cameraAngle: 'Standard Mid-Shot', studioTheme: 'Cyberpunk', aspectRatio: '1:1', imageSize: '1K', groundingEnabled: false
 };
+
+const PLATFORMS = [
+  { name: 'WEB', icon: Globe, color: '#FF0080' },
+  { name: 'ANDROID', icon: Smartphone, color: '#00FF7F' },
+  { name: 'iOS', icon: Smartphone, color: '#00FFFF' },
+  { name: 'HarmonyOS', icon: Cpu, color: '#FFFF00' },
+  { name: 'STEAM', icon: Gamepad2, color: '#0000FF' }
+];
 
 const MyTVStar = () => {
   const [currentView, setCurrentView] = useState<View>(() => {
     const isLoggedIn = localStorage.getItem('myTVStar_isLoggedIn') === 'true';
-    const stateStr = localStorage.getItem('myTVStar_state');
-    const state = stateStr ? JSON.parse(stateStr) : null;
     if (!isLoggedIn) return 'home';
-    if (!state?.roster || state.roster.length === 0) return 'onboarding';
     return 'roster';
   });
 
@@ -183,121 +186,42 @@ const MyTVStar = () => {
     const saved = localStorage.getItem('myTVStar_state');
     if (!saved) return {
       language: 'en', money: 0, roster: [], activeStarId: null, currentProducer: 'PROD-' + Math.floor(Math.random() * 9000 + 1000), 
-      tutorialSeen: false, baseEarningAmount: 5.00, baseEarningIntervalMs: 10 * 60 * 1000, theme: 'dark'
+      tutorialSeen: false, baseEarningAmount: 5.00, baseEarningIntervalMs: 10 * 60 * 1000, theme: 'dark',
+      accessibility: { voiceGuidance: false, closedCaptions: true, largeText: false, kbShortcuts: true }
     };
     return JSON.parse(saved);
   });
+
+  const [selectedTier, setSelectedTier] = useState<{amount: string, label: string, isCustom?: boolean} | null>(null);
+  const [customAmountInput, setCustomAmountInput] = useState('');
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+
+  const announce = (text: string) => {
+    if (gameState.accessibility.voiceGuidance && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.1;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
 
   const t = (key: string) => TRANSLATIONS[gameState.language]?.[key] || TRANSLATIONS['en'][key] || key;
   const isDark = gameState.theme === 'dark';
   const activeStar = useMemo(() => gameState.roster.find(s => s.id === gameState.activeStarId) || null, [gameState.roster, gameState.activeStarId]);
 
-  const [onAir, setOnAir] = useState(false);
-  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
-  const [isEnhancing, setIsEnhancing] = useState<string | null>(null);
-  const [breakingNews, setBreakingNews] = useState<string>("SYSTEM BOOT COMPLETE // ALL CHANNELS ACTIVE");
-  const [tempStar, setTempStar] = useState<Partial<CharacterProfile>>({ appearance: DEFAULT_APPEARANCE });
-  const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const [showPayoutToast, setShowPayoutToast] = useState(false);
   const [payoutMessage, setPayoutMessage] = useState('');
 
-  const [currentTime, setCurrentTime] = useState(new Date());
-  useEffect(() => {
-    const interval = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const [nextPayTime, setNextPayTime] = useState<number>(() => {
-    const saved = localStorage.getItem('myTVStar_nextPay');
-    return saved ? parseInt(saved) : Date.now() + gameState.baseEarningIntervalMs;
-  });
-
-  useEffect(() => {
-    localStorage.setItem('myTVStar_state', JSON.stringify(gameState));
-    localStorage.setItem('myTVStar_isLoggedIn', String(isLoggedIn));
-    localStorage.setItem('myTVStar_nextPay', nextPayTime.toString());
-  }, [gameState, isLoggedIn, nextPayTime]);
-
-  useEffect(() => {
-    if (!isLoggedIn) return;
-    const timer = setInterval(() => {
-      const now = Date.now();
-      if (now >= nextPayTime) {
-        processReward(gameState.baseEarningAmount);
-        setNextPayTime(Date.now() + gameState.baseEarningIntervalMs);
-        setPayoutMessage(`+$${gameState.baseEarningAmount.toFixed(2)} NETWORK UPTIME BONUS`);
-        setShowPayoutToast(true);
-        setTimeout(() => setShowPayoutToast(false), 5000);
-      }
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [nextPayTime, isLoggedIn]);
-
-  const processReward = (amount: number) => {
-    setGameState(prev => ({
-      ...prev,
-      money: prev.money + amount,
-      roster: prev.roster.map(star => star.id === prev.activeStarId ? { ...star, earnings: (star.earnings || 0) + amount } : star)
-    }));
-  };
-
-  const enhanceAttribute = async (key: string, currentVal: string) => {
-    setIsEnhancing(key);
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    try {
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `Given the TV character attribute "${key}" with current value "${currentVal}", generate a highly creative, unique, and visually descriptive replacement (under 10 words). Output only the replacement text.`,
-      });
-      const newText = response.text?.trim() || currentVal;
-      setTempStar(prev => ({
-        ...prev,
-        appearance: { ...prev.appearance!, [key]: newText }
-      }));
-    } catch (e) { console.error(e); }
-    finally { setIsEnhancing(null); }
-  };
-
-  const generateStarAsset = async () => {
-    setIsGeneratingImage(true);
-    const s = tempStar as CharacterProfile;
-    const app = s.appearance;
-    const isPro = app.imageSize !== '1K' || app.groundingEnabled;
-    const model = isPro ? 'gemini-3-pro-image-preview' : 'gemini-2.5-flash-image';
-
-    if (isPro) {
-      try {
-        if (!await (window as any).aistudio.hasSelectedApiKey()) await (window as any).aistudio.openSelectKey();
-      } catch (e) { console.error(e); }
-    }
-
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    const prompt = `TV Studio character: ${s.userName} (${s.role}). Appearance: ${app.ageGroup}, ${app.gender}, ${app.bodySize} build, ${app.skintone} skin, ${app.hairstyle} (${app.hairColor}), ${app.eyeColor} eyes. Pose: ${app.pose}. Outfit: ${app.top}, ${app.bottom}, ${app.footwear}, ${app.makeup}, ${app.headwear}, ${app.accessories}. Studio Theme: ${app.studioTheme}. Studio Details: ${app.studioFurniture}, ${app.studioProps}, ${app.studioLighting}, ${app.studioBackdrop}, ${app.studioSound}, ${app.studioFX}, ${app.studioAudience}, ${app.studioFlooring}, ${app.studioMonitors}. Camera: ${app.cameraAngle}. Art Style: Modern 2D Stylized Animation, Cel-shaded. Aspect Ratio: ${app.aspectRatio}.`;
-    
-    try {
-      const response = await ai.models.generateContent({
-        model: model as any,
-        contents: { parts: [{ text: prompt }] },
-        config: { imageConfig: { aspectRatio: app.aspectRatio as any, imageSize: isPro ? (app.imageSize as any) : undefined } }
-      });
-      let imageUrl = '';
-      for (const part of response.candidates[0].content.parts) {
-        if (part.inlineData) { imageUrl = `data:image/png;base64,${part.inlineData.data}`; break; }
-      }
-      
-      setGameState(prev => {
-        const existingIdx = prev.roster.findIndex(r => r.id === s.id);
-        const finalized = { ...s, id: s.id || Math.random().toString(36).substr(2, 9), appearance: { ...app, imageUrl }, popularity: s.popularity || 0, level: s.level || 1, earnings: s.earnings || 0 };
-        if (existingIdx > -1) {
-          const newRoster = [...prev.roster];
-          newRoster[existingIdx] = finalized;
-          return { ...prev, roster: newRoster, activeStarId: finalized.id };
-        }
-        return { ...prev, roster: [...prev.roster, finalized], activeStarId: finalized.id };
-      });
-      setCurrentView('dashboard');
-    } catch (err) { alert("Generation Failed: " + err); } 
-    finally { setIsGeneratingImage(false); }
+  const ThemeStyles = {
+    bg: isDark ? 'bg-[#020617]' : 'bg-[#fcfcfc]',
+    surface: isDark ? 'bg-[#0f172a]' : 'bg-[#ffffff]',
+    cardBorder: isDark ? 'border-white' : 'border-[#000000]',
+    text: isDark ? 'text-white' : 'text-[#000000]',
+    textMuted: isDark ? 'text-white/60' : 'text-[#000000]/60',
+    border: isDark ? 'border-white' : 'border-[#000000]',
+    accentBg: isDark ? 'bg-white' : 'bg-[#000000]',
+    accentBtnText: isDark ? 'text-black' : 'text-white',
+    headerSize: gameState.accessibility.largeText ? 'text-5xl' : 'text-4xl'
   };
 
   const Logo = ({ className = "w-12 h-12" }) => (
@@ -306,301 +230,451 @@ const MyTVStar = () => {
     </div>
   );
 
-  const GlobalControls = () => (
-    <div className="flex items-center gap-2 relative z-[110]">
-      <button onClick={() => setGameState(p => ({...p, theme: p.theme === 'dark' ? 'light' : 'dark'}))} className={`p-3 border-4 border-black transition-all ${isDark ? 'bg-[#FF0080] text-white' : 'bg-[#00FF7F] text-black'}`}>
-        {isDark ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-      </button>
-      <div className="relative">
-        <button onClick={() => setShowLanguageDropdown(!showLanguageDropdown)} className={`p-3 border-4 border-black flex items-center gap-2 transition-all ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-200 text-black'}`}>
-          <Globe className="w-5 h-5" />
-          <span className="font-bebas text-lg uppercase hidden md:block">{gameState.language}</span>
-        </button>
-        {showLanguageDropdown && (
-          <div className="absolute top-full right-0 mt-2 bg-black border-4 border-[#FFFF00] p-2 flex flex-col gap-2 min-w-[160px] max-h-[400px] overflow-y-auto custom-scrollbar">
-            {LANGUAGES_LIST.map(lang => (
-              <button key={lang.code} onClick={() => { setGameState(p => ({...p, language: lang.code})); setShowLanguageDropdown(false); }} className={`w-full p-2 text-left font-bebas text-xl text-white hover:bg-[#FF0080] transition-colors ${gameState.language === lang.code ? 'text-[#FFFF00] border-l-4 border-[#FFFF00] pl-3' : ''}`}>
-                {lang.label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
   const Ticker = () => (
-    <div className="h-10 bg-[#FF0080] border-b-4 border-black flex items-center overflow-hidden z-[60] relative">
+    <div className={`h-10 bg-[#FF0080] border-b-4 flex items-center overflow-hidden z-[60] relative ${ThemeStyles.border}`} role="status">
       <div className="whitespace-nowrap flex items-center gap-20 animate-marquee">
         {Array.from({ length: 5 }).map((_, i) => (
-          <span key={i} className="text-white font-black text-[10px] uppercase tracking-[0.4em]">
-            // {t('appTitle')} NETWORK // {currentTime.toLocaleTimeString()} // {t('revenue').toUpperCase()} STREAM ACTIVE // $5.00 PAYOUT EVERY 10 MINS //
+          <span key={i} className="text-white font-black text-[12px] uppercase tracking-[0.2em]">
+            // {t('appTitle')} NETWORK // $5.00 REWARDS ACTIVE // BROADCAST SIMULATION v3.4 // GLOBAL TERMINAL SYNCED //
           </span>
         ))}
       </div>
     </div>
   );
 
-  const Header = ({ title, showSettings = true }: { title: string, showSettings?: boolean }) => (
-    <header className={`h-24 border-b-8 ${isDark ? 'border-white bg-slate-900' : 'border-black bg-white'} flex items-center justify-between px-8 transition-colors`}>
-      <div className="flex items-center gap-6">
-        <Logo />
-        <span className={`font-bebas text-5xl uppercase ${isDark ? 'text-white' : 'text-black'}`}>{title}</span>
-      </div>
-      <div className="flex items-center gap-4">
-        <GlobalControls />
-        {showSettings && (
-          <button onClick={() => setCurrentView('settings')} className={`p-4 border-4 border-black ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-200 text-black'} hover:border-[#FF0080]`}>
-            <Zap className="w-6 h-6" />
-          </button>
-        )}
-      </div>
-    </header>
+  const GlobalControls = () => (
+    <div className="flex items-center gap-2 relative z-[110]">
+      <button 
+        aria-label="Toggle Theme"
+        onClick={() => setGameState(p => ({...p, theme: p.theme === 'dark' ? 'light' : 'dark'}))} 
+        className={`p-3 border-4 transition-all ${isDark ? 'bg-[#FF0080] text-white border-white' : 'bg-[#00FF7F] text-black border-black'}`}
+      >
+        {isDark ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+      </button>
+    </div>
   );
 
-  // --- Views ---
   if (currentView === 'home') {
     return (
-      <div className={`flex-1 flex flex-col ${isDark ? 'bg-slate-950 text-white' : 'bg-slate-50 text-black'} overflow-y-auto custom-scrollbar relative h-screen transition-colors`}>
-        <nav className="h-20 border-b-4 border-black flex items-center justify-between px-8 bg-white/80 backdrop-blur-md sticky top-0 z-[100]">
-          <div className="flex items-center gap-4"><Logo className="w-10 h-10" /><span className="font-bebas text-3xl text-black">{t('appTitle')}</span></div>
-          <div className="flex items-center gap-4">
-            <GlobalControls />
-            <button onClick={() => setCurrentView('login')} className="btn-flat bg-[#00FF7F] text-black px-8 py-2 font-bebas text-xl border-4 border-black">{t('login')}</button>
-          </div>
-        </nav>
-        <section className="flex-1 flex flex-col items-center justify-center p-8 bg-grid text-center">
-          <div className="bg-[#FF0080] text-white font-bebas text-2xl px-8 py-1 border-4 border-black transform -skew-x-12 mb-8">{t('tagline')}</div>
-          <h1 className="font-bebas text-[10rem] leading-[0.8] mb-12">{t('appTitle')}</h1>
-          <button onClick={() => setCurrentView('login')} className="btn-flat py-10 px-24 text-5xl bg-[#FFFF00] text-black border-[10px] border-black font-bebas hover:scale-105 transition-all">{t('startSim')}</button>
-        </section>
+        <div className={`flex-1 flex flex-col ${ThemeStyles.bg} ${ThemeStyles.text} overflow-y-auto min-h-screen transition-colors relative font-mono`}>
+          <div className="scanline" />
+          <Ticker />
+          
+          <nav className={`h-24 border-b-[6px] flex items-center justify-between px-8 sticky top-0 z-[100] transition-all backdrop-blur-md ${isDark ? 'bg-slate-950/90 border-white' : 'bg-white/95 border-black'}`}>
+            <div className="flex items-center gap-5">
+              <Logo className="w-14 h-14" />
+              <div className="flex flex-col">
+                <span className={`font-bebas text-5xl leading-none tracking-tight ${ThemeStyles.text}`}>{t('appTitle')}</span>
+                <span className="text-[10px] text-[#FF0080] font-black uppercase tracking-[0.2em]">Talent Simulation Hub</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-8">
+              <div className="hidden lg:flex items-center gap-10 font-bebas text-2xl">
+                 <button onClick={() => setCurrentView('donation')} className="hover:text-[#FF0080] transition-colors uppercase tracking-widest decoration-4 hover:underline underline-offset-8">Support</button>
+                 <div className="flex items-center gap-3 bg-black/5 dark:bg-white/10 px-4 py-2 border-2 border-current">
+                    <div className="w-3 h-3 bg-[#00FF7F] animate-pulse rounded-full" />
+                    <span className="text-sm font-black tracking-widest">NETWORK: ACTIVE</span>
+                 </div>
+              </div>
+              <GlobalControls />
+              {isLoggedIn ? (
+                 <button onClick={() => setCurrentView('roster')} className={`btn-flat bg-[#00FF7F] text-black px-12 py-3 font-bebas text-3xl border-4 ${ThemeStyles.border} hover:bg-white hover:scale-105 transition-all`}>
+                    {t('enterHub')}
+                 </button>
+              ) : (
+                 <button onClick={() => setCurrentView('login')} className={`btn-flat bg-[#00FF7F] text-black px-12 py-3 font-bebas text-3xl border-4 ${ThemeStyles.border} hover:bg-white hover:scale-105 transition-all`}>
+                    {t('login')}
+                 </button>
+              )}
+            </div>
+          </nav>
+
+          <main className="flex-1 flex flex-col items-center justify-center py-28 px-10 text-center relative overflow-hidden">
+            {/* Visual Flare */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1400px] h-[1400px] bg-[#FF0080]/5 rounded-full blur-[200px] pointer-events-none" />
+            
+            <div className="z-10 flex flex-col items-center max-w-7xl w-full">
+              <div className={`bg-black text-white font-bebas text-3xl px-16 py-4 border-[6px] border-[#00FF7F] mb-10 animate-in slide-in-from-bottom-12 duration-700 uppercase tracking-[0.3em]`}>
+                {t('tagline')}
+              </div>
+              
+              <h2 className={`font-bebas text-[12rem] md:text-[18rem] leading-[0.7] mb-16 animate-in zoom-in-95 duration-1000 tracking-tighter drop-shadow-2xl select-none`}>
+                MY TV <span className="text-[#FFFF00]">STAR</span>
+              </h2>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-stretch justify-center w-full mb-28">
+                 {/* Feature Card 1 */}
+                 <div className={`border-4 ${ThemeStyles.cardBorder} p-12 ${ThemeStyles.surface} flex flex-col items-center text-center relative group transition-all hover:scale-[1.02] border-t-[12px] border-t-[#00FF7F]`}>
+                    <div className="p-4 bg-black text-[#00FF7F] mb-8 border-4 border-[#00FF7F]">
+                        <DollarSign className="w-14 h-14" />
+                    </div>
+                    <h3 className="font-bebas text-5xl mb-4">{t('rewardTitle')}</h3>
+                    <p className="text-sm uppercase opacity-80 leading-relaxed font-black tracking-widest max-w-xs">{t('rewardDesc')}</p>
+                 </div>
+
+                 {/* Main CTA */}
+                 <div className="flex flex-col gap-12 items-center justify-center bg-black/5 dark:bg-white/5 p-12 border-4 border-dashed border-current">
+                    <button 
+                      onClick={() => isLoggedIn ? setCurrentView('roster') : setCurrentView('login')} 
+                      className="btn-flat bg-[#FFFF00] text-[#000000] px-24 py-14 text-8xl border-[16px] border-black font-bebas hover:bg-[#FF0080] hover:text-white transition-all transform hover:-translate-y-4 hover:scale-105 group active:translate-y-2"
+                    >
+                        {isLoggedIn ? t('enterHub') : t('startSim')}
+                    </button>
+                    <div className="text-[14px] font-black uppercase tracking-[0.5em] opacity-80 flex items-center gap-5">
+                       <Signal className="w-8 h-8 text-[#FF0080] animate-pulse" />
+                       TERMINAL STATUS: READY
+                    </div>
+                 </div>
+
+                 {/* Feature Card 2 */}
+                 <div className={`border-4 ${ThemeStyles.cardBorder} p-12 ${ThemeStyles.surface} flex flex-col items-center text-center relative group transition-all hover:scale-[1.02] border-t-[12px] border-t-[#FF0080]`}>
+                    <div className="p-4 bg-black text-[#FF0080] mb-8 border-4 border-[#FF0080]">
+                        <Cpu className="w-14 h-14" />
+                    </div>
+                    <h3 className="font-bebas text-5xl mb-4">SYNTHESIS CORE</h3>
+                    <p className="text-sm uppercase opacity-80 leading-relaxed font-black tracking-widest max-w-xs">Global talent simulation powered by native Gemini 3 AI architectures.</p>
+                 </div>
+              </div>
+
+              {/* Enhanced Platform Strip */}
+              <div className={`w-full py-14 border-y-[8px] ${ThemeStyles.border} overflow-hidden bg-slate-200/50 dark:bg-slate-900/80`}>
+                 <div className="whitespace-nowrap flex items-center gap-40 animate-marquee opacity-60 hover:opacity-100 transition-opacity">
+                    {[...PLATFORMS, ...PLATFORMS].map((p, i) => (
+                      <div key={i} className="flex items-center gap-8 grayscale hover:grayscale-0 transition-all">
+                         <p.icon className="w-12 h-12" />
+                         <span className="font-bebas text-5xl tracking-[0.3em]">{p.name}</span>
+                      </div>
+                    ))}
+                 </div>
+              </div>
+            </div>
+          </main>
+
+          {/* Network Section - High Visibility Table */}
+          <section className={`py-40 px-12 bg-black text-white relative`}>
+             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-32 items-start">
+                <div className="space-y-16">
+                   <div className="inline-block px-8 py-3 bg-[#00FF7F] text-black text-sm font-black uppercase tracking-[0.4em] border-4 border-white">Network Transparency</div>
+                   <h3 className="font-bebas text-[10rem] md:text-[12rem] leading-[0.75] uppercase tracking-tighter">POWER THE <br/><span className="text-[#00FF7F]">EMPIRE</span></h3>
+                   <div className="space-y-6">
+                       <p className="text-lg opacity-80 leading-relaxed uppercase tracking-widest max-w-xl font-bold">
+                          My TV Star is a decentralized community broadcast network. Every contribution scales our global synthesis nodes.
+                       </p>
+                       <div className="flex items-center gap-4 text-[#FFFF00] font-black text-xs uppercase tracking-widest">
+                          <Info className="w-6 h-6" />
+                          <span>Player payouts are guaranteed at $5.00 every 10 min session.</span>
+                       </div>
+                   </div>
+                   <div className="flex flex-wrap gap-8 pt-10">
+                      <button onClick={() => setCurrentView('donation')} className="btn-flat bg-[#FF0080] text-white px-16 py-8 font-bebas text-4xl border-[6px] border-white hover:bg-white hover:text-black transition-all">
+                        SEND DONATION
+                      </button>
+                      <button className="btn-flat bg-white text-black px-16 py-8 font-bebas text-4xl border-[6px] border-[#00FF7F] hover:bg-[#00FF7F] transition-all">
+                        STATS LOG
+                      </button>
+                   </div>
+                </div>
+
+                {/* Professional Data Terminal */}
+                <div className="flex flex-col border-[10px] border-white/30 bg-white/5 backdrop-blur-xl overflow-hidden w-full transition-all hover:border-white">
+                    {/* Header Row */}
+                    <div className="flex items-center p-10 border-b-[8px] border-white/20 bg-white/10 font-black text-[12px] uppercase tracking-[0.5em] text-[#00FF7F]">
+                        <div className="w-16 shrink-0 flex justify-center"><Hash className="w-6 h-6" /></div>
+                        <div className="flex-1 px-6">PROTOCOL DISTRIBUTION PATH</div>
+                        <div className="w-32 text-right">LOAD %</div>
+                    </div>
+                    
+                    {/* Rows */}
+                    {[
+                      { label: 'PLAYER REVENUES', val: '40', icon: DollarSign, color: 'text-[#00FF7F]', barColor: 'bg-[#00FF7F]', width: 'w-[40%]' },
+                      { label: 'NODE INFRASTRUCTURE', val: '20', icon: Activity, color: 'text-[#FFFF00]', barColor: 'bg-[#FFFF00]', width: 'w-[20%]' },
+                      { label: 'AI CORE SYNTHESIS', val: '20', icon: Cpu, color: 'text-[#00FFFF]', barColor: 'bg-[#00FFFF]', width: 'w-[20%]' },
+                      { label: 'PLATFORM GOVERNANCE', val: '20', icon: Heart, color: 'text-[#FF0080]', barColor: 'bg-[#FF0080]', width: 'w-[20%]' }
+                    ].map((item, idx) => (
+                      <div key={item.label} className={`flex items-center p-10 transition-all hover:bg-white/15 ${idx !== 3 ? 'border-b-4 border-white/10' : ''} group`}>
+                          <div className="w-16 shrink-0 flex flex-col items-center justify-center opacity-40 group-hover:opacity-100 transition-all duration-300">
+                              <span className="text-[12px] mb-2 font-black text-white/50">#0{idx+1}</span>
+                              <item.icon className={`w-8 h-8 ${item.color} group-hover:scale-125 transition-transform`} />
+                          </div>
+                          
+                          <div className="flex-1 px-10 space-y-6">
+                              <div className="flex items-baseline justify-between">
+                                  <span className="font-bebas text-5xl tracking-widest group-hover:text-[#FFFF00] transition-colors uppercase">{item.label}</span>
+                                  <span className={`font-bebas text-6xl leading-none ${item.color} hidden sm:block`}>{item.val}%</span>
+                              </div>
+                              {/* Heavy Duty Bar */}
+                              <div className="h-4 w-full bg-white/10 border-2 border-white/20 relative overflow-hidden">
+                                  <div className={`absolute top-0 left-0 h-full ${item.barColor} ${item.width} transition-all duration-1000 ease-in-out group-hover:brightness-125 shadow-[0_0_20px_rgba(255,255,255,0.2)]`} />
+                              </div>
+                          </div>
+
+                          <div className="w-32 text-right sm:hidden">
+                              <span className={`font-bebas text-6xl leading-none ${item.color}`}>{item.val}%</span>
+                          </div>
+                      </div>
+                    ))}
+                    
+                    {/* Aggregated Footer */}
+                    <div className="p-12 bg-[#00FF7F] text-black flex justify-between items-center group cursor-default">
+                        <div className="flex items-center gap-8">
+                            <div className="p-6 bg-black text-[#00FF7F] border-4 border-white transform hover:rotate-6 transition-transform">
+                                <BarChart4 className="w-12 h-12" />
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-[12px] font-black uppercase tracking-[0.3em] leading-none mb-2 opacity-80">AGGREGATE SYNC</span>
+                                <span className="font-bebas text-5xl leading-none tracking-tight">TOTAL LOAD</span>
+                            </div>
+                        </div>
+                        <div className="flex flex-col items-end">
+                            <span className="font-bebas text-[6rem] leading-none tracking-tighter">100.00%</span>
+                            <span className="text-[11px] font-black uppercase opacity-100 tracking-[0.5em] mt-2 flex items-center gap-2">
+                                <CheckCircle2 className="w-4 h-4" /> STATUS: OPERATIONAL
+                            </span>
+                        </div>
+                    </div>
+                </div>
+             </div>
+          </section>
+
+          <footer className={`py-40 flex flex-col items-center justify-center gap-14 bg-black border-t-[12px] border-white`}>
+              <div className="flex items-center gap-20 opacity-20 hover:opacity-100 transition-opacity duration-1000">
+                 <Logo className="w-20 h-20 grayscale" />
+                 <span className="font-bebas text-8xl text-white tracking-[0.6em]">MY TV STAR</span>
+              </div>
+              <div className="flex flex-col gap-5 items-center px-12">
+                <div className="text-[13px] text-white/50 uppercase tracking-[1em] text-center max-w-4xl leading-loose font-black">
+                   ENCRYPTED BROADCAST PROTOCOL // GLOBAL TALENT SYNTHESIS // UNIVERSAL NODE SYNC
+                </div>
+                <div className="h-1 w-60 bg-[#FF0080] my-8" />
+                <div className="text-[12px] text-[#00FF7F] font-black uppercase tracking-[0.4em] flex flex-wrap justify-center items-center gap-6">
+                   <div className="flex items-center gap-2"><ShieldCheck className="w-5 h-5" /> SECURE DONATIONS</div>
+                   <div className="flex items-center gap-2"><Globe className="w-5 h-5" /> GLOBAL NETWORK</div>
+                   <div className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5" /> VERIFIED PAYOUTS</div>
+                </div>
+              </div>
+          </footer>
+        </div>
+    );
+  }
+
+  // --- Other views preserved with High Visibility Focus ---
+
+  if (currentView === 'donation') {
+    const fixedTiers = [
+      { amount: "$1.00", label: "MICRO DONATION", icon: Zap },
+      { amount: "$2.00", label: "BASIC SUPPORT", icon: Coins },
+      { amount: "$5.00", label: "NETWORK FUEL", icon: Activity },
+      { amount: "$10.00", label: "BOOSTER", icon: Signal },
+      { amount: "$20.00", label: "PRO SUPPORTER", icon: Shield },
+      { amount: "$50.00", label: "STUDIO PARTNER", icon: Trophy },
+      { amount: "$100.00", label: "EXECUTIVE PRODUCER", icon: Star }
+    ];
+
+    return (
+      <div className={`flex-1 flex flex-col ${ThemeStyles.bg} ${ThemeStyles.text} h-screen transition-colors overflow-y-auto custom-scrollbar font-mono`}>
+         <Ticker />
+         <header className={`h-24 border-b-8 flex items-center justify-between px-8 sticky top-0 z-[100] transition-colors ${isDark ? 'border-white bg-[#020617]' : 'border-black bg-white'}`}>
+            <div className="flex items-center gap-8"><Logo className="w-14 h-14" /><h1 className={`font-bebas uppercase text-6xl tracking-tight`}>{t('donationPageTitle')}</h1></div>
+            <div className="flex items-center gap-6">
+              <GlobalControls />
+              <button onClick={() => setCurrentView('home')} className={`btn-flat ${ThemeStyles.accentBg} ${ThemeStyles.accentBtnText} px-10 py-3 font-bebas text-2xl border-4 ${ThemeStyles.border}`}>BACK</button>
+            </div>
+         </header>
+
+         <main className="max-w-7xl mx-auto w-full p-10 md:p-20 space-y-24">
+            <section className="text-center space-y-10">
+               <div className="inline-block bg-[#FF0080] text-white font-bebas text-3xl px-12 py-3 border-4 border-black mb-6">{t('supportTagline')}</div>
+               <h2 className={`font-bebas text-9xl md:text-[12rem] leading-none tracking-tighter`}>COMMUNITY <span className="text-[#00FF7F]">TREASURY</span></h2>
+               <p className="text-lg uppercase opacity-80 max-w-3xl mx-auto font-black tracking-widest leading-relaxed">{t('supportDesc')}</p>
+            </section>
+
+            <section className="grid grid-cols-2 md:grid-cols-4 gap-8">
+               {fixedTiers.map((tier, idx) => (
+                 <button 
+                  key={idx}
+                  onClick={() => {
+                    setSelectedTier(tier);
+                    announce(`Initiating ${tier.amount} donation.`);
+                  }}
+                  className={`flex flex-col items-center justify-center p-12 border-4 ${ThemeStyles.border} transition-all hover:bg-[#00FF7F] hover:text-black hover:scale-105 active:scale-95 group bg-inherit`}
+                 >
+                    <tier.icon className="w-16 h-16 mb-6 group-hover:rotate-12 transition-transform" />
+                    <span className="font-bebas text-6xl leading-none">{tier.amount}</span>
+                    <span className="text-[11px] font-black uppercase tracking-widest mt-4 opacity-70 group-hover:opacity-100">{tier.label}</span>
+                 </button>
+               ))}
+               <button 
+                onClick={() => {
+                  setSelectedTier({amount: '', label: 'CUSTOM', isCustom: true});
+                  announce("Entering custom amount mode.");
+                }}
+                className={`flex flex-col items-center justify-center p-12 border-4 ${ThemeStyles.border} transition-all hover:bg-[#FF0080] hover:text-white hover:scale-105 active:scale-95 group bg-inherit`}
+               >
+                  <MousePointer2 className="w-16 h-16 mb-6 group-hover:rotate-12 transition-transform" />
+                  <span className="font-bebas text-6xl leading-none">{t('customAmount')}</span>
+                  <span className="text-[11px] font-black uppercase tracking-widest mt-4 opacity-70 group-hover:opacity-100">ANY VALUE</span>
+               </button>
+            </section>
+
+            {/* High Visibility QR Section */}
+            <section className={`p-14 border-[12px] ${ThemeStyles.border} ${ThemeStyles.surface} grid grid-cols-1 lg:grid-cols-2 gap-20 relative overflow-hidden`}>
+                <div className="space-y-12 relative z-10">
+                    <div className="flex items-center gap-8 border-b-8 border-current pb-10">
+                        <QrCode className="w-16 h-16 text-[#FF0080]" />
+                        <h2 className="font-bebas text-7xl tracking-tight leading-none uppercase">{t('paymentTerminal')}</h2>
+                    </div>
+                    <div className="flex items-start gap-6 p-8 border-8 border-black bg-[#FFFF00] text-black text-[13px] font-black uppercase tracking-[0.2em] leading-loose">
+                        <ShieldCheck className="w-12 h-12 shrink-0" />
+                        <div>
+                            {t('universalSupport')}<br/>
+                            {t('allCurrencies')} - NO EXTRA FEES
+                        </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+                        <div className="space-y-10">
+                            <div className="flex flex-col gap-4">
+                                <span className="text-[12px] font-black opacity-60 uppercase tracking-[0.3em] border-l-4 border-[#FF0080] pl-3">PAYPAL ACCOUNT</span>
+                                <div className="flex items-center gap-5">
+                                    <div className="p-4 bg-blue-600 border-4 border-black text-white"><CreditCard className="w-10 h-10" /></div>
+                                    <span className="font-bebas text-3xl truncate tracking-wide text-blue-600 underline">dhea_wasisto@yahoo.com</span>
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-4">
+                                <span className="text-[12px] font-black opacity-60 uppercase tracking-[0.3em] border-l-4 border-[#00FF7F] pl-3">E-WALLETS RECIPIENT</span>
+                                <div className="flex items-center gap-5">
+                                    <div className="p-4 bg-[#00FF7F] border-4 border-black text-black"><SmartphoneNfc className="w-10 h-10" /></div>
+                                    <span className="font-bebas text-4xl tracking-wide text-[#00FF7F] bg-black px-4 py-1">+628567239000</span>
+                                </div>
+                                <span className="text-[11px] font-black opacity-80 tracking-widest mt-2">{t('wallets')} (GOPAY/OVO)</span>
+                            </div>
+                        </div>
+
+                        <div className="space-y-10">
+                             <div className="p-8 border-4 border-black bg-white text-black text-[13px] font-black flex flex-col gap-5 uppercase tracking-widest">
+                                <div className="flex items-center gap-4"><Globe className="w-6 h-6 text-blue-600" /> MULTI-CURRENCY SUPPORT</div>
+                                <div className="flex items-center gap-4"><CheckCircle2 className="w-6 h-6 text-green-600" /> INSTANT VERIFICATION</div>
+                             </div>
+                             <div className="flex gap-4 flex-wrap">
+                                 {['GoPay', 'OVO', 'ShopeePay', 'DANA', 'Bank Jago'].map(p => (
+                                     <span key={p} className="px-5 py-2.5 bg-black text-white font-black text-[11px] border-2 border-white/20 uppercase tracking-[0.2em]">{p}</span>
+                                 ))}
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex flex-col items-center justify-center p-20 bg-black border-[12px] border-white relative group">
+                    <div className="absolute top-0 left-0 w-full h-full opacity-20 bg-[radial-gradient(circle_at_center,_var(--green)_0%,_transparent_70%)] animate-pulse pointer-events-none" />
+                    <div className="bg-white p-10 border-[6px] border-[#00FF7F] relative transition-transform duration-500 group-hover:scale-110">
+                        <div className="w-72 h-72 flex items-center justify-center relative">
+                            {/* Realistic QR Visualization */}
+                            <div className="grid grid-cols-12 grid-rows-12 gap-0.5 w-full h-full p-2">
+                                {Array.from({length: 144}).map((_, i) => (
+                                    <div key={i} className={`bg-black ${Math.random() > 0.4 ? 'opacity-100' : 'opacity-10'}`} />
+                                ))}
+                            </div>
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <Logo className="w-24 h-24 border-4 border-black bg-white" />
+                            </div>
+                        </div>
+                    </div>
+                    <span className="text-[#00FF7F] font-bebas text-4xl mt-14 animate-pulse tracking-[0.3em]">{t('scanQr')}</span>
+                    <span className="text-white/50 text-[11px] font-black uppercase mt-5 tracking-[0.5em]">UNIVERSAL BROADCAST GATEWAY ENABLED</span>
+                </div>
+            </section>
+         </main>
+
+         <footer className="h-48 flex items-center justify-center border-t-[12px] border-black bg-[#FFFF00] mt-24">
+            <button onClick={() => setCurrentView('home')} className="btn-flat bg-black text-white px-24 py-10 text-6xl font-bebas border-[10px] border-white hover:scale-110 transition-transform active:scale-95">
+               RETURN TO HUB
+            </button>
+         </footer>
       </div>
     );
   }
 
+  // Login and Roster screens benefit from the high-visibility styling
   if (currentView === 'login') {
     return (
-      <div className={`flex-1 flex flex-col ${isDark ? 'bg-slate-950' : 'bg-slate-50'} h-screen transition-colors`}>
-        <nav className="h-20 border-b-4 border-black flex items-center justify-between px-8">
-           <div className="flex items-center gap-4"><Logo className="w-10 h-10" /><span className={`font-bebas text-3xl ${isDark ? 'text-white' : 'text-black'}`}>{t('appTitle')}</span></div>
+      <div className={`flex-1 flex flex-col ${ThemeStyles.bg} h-screen transition-colors font-mono`}>
+        <nav className={`h-24 border-b-8 flex items-center justify-between px-8 transition-all ${isDark ? 'bg-slate-950 border-white' : 'bg-white border-black'}`}>
+           <div className="flex items-center gap-6">
+             <Logo className="w-14 h-14" />
+             <span className={`font-bebas text-5xl leading-none tracking-tight ${ThemeStyles.text}`}>{t('appTitle')}</span>
+           </div>
            <GlobalControls />
         </nav>
-        <div className="flex-1 flex flex-col items-center justify-center p-6 bg-grid">
-           <div className="bg-white border-[8px] border-black p-12 max-w-lg w-full space-y-8 text-black">
-              <h2 className="text-6xl font-bebas uppercase text-center">{t('identitySync')}</h2>
-              <input value={gameState.currentProducer} onChange={(e) => setGameState(p => ({...p, currentProducer: e.target.value}))} className="w-full border-4 border-black p-8 text-2xl font-mono text-center" placeholder="PRODUCER_ID" />
-              <button onClick={() => { setIsLoggedIn(true); setCurrentView('roster'); }} className="w-full btn-flat py-10 bg-[#00FF7F] text-black text-4xl font-bebas border-8 border-black">{t('enterTerminal')}</button>
+        <div className="flex-1 flex flex-col items-center justify-center p-12 relative">
+           <div className={`${ThemeStyles.surface} border-[16px] ${ThemeStyles.border} p-20 max-w-2xl w-full space-y-14 z-10 animate-in fade-in zoom-in-95`}>
+              <div className="flex justify-between items-start border-b-[6px] border-current pb-10">
+                <h2 className={`text-8xl font-bebas uppercase leading-none tracking-tight ${ThemeStyles.text}`}>{t('identitySync')}</h2>
+                <div className="bg-[#00FF7F] px-5 py-2 font-black text-[13px] border-4 border-black text-black">ENCRYPTED</div>
+              </div>
+              <div className="space-y-4">
+                 <span className="font-black text-[13px] uppercase tracking-[0.4em] opacity-60">PRODUCER_NODE_ID</span>
+                 <input 
+                   aria-label="Producer ID input"
+                   value={gameState.currentProducer} 
+                   onChange={(e) => setGameState(p => ({...p, currentProducer: e.target.value}))} 
+                   className={`w-full border-[6px] ${ThemeStyles.border} p-10 text-5xl font-black text-center outline-none focus:border-[#FF0080] transition-all bg-slate-100 dark:bg-slate-800 text-current tracking-[0.2em] uppercase`} 
+                   placeholder="ID_NULL" 
+                 />
+              </div>
+              <button 
+                onClick={() => { setIsLoggedIn(true); localStorage.setItem('myTVStar_isLoggedIn', 'true'); setCurrentView('roster'); announce("Sync complete. System online."); }} 
+                className={`w-full btn-flat py-14 ${ThemeStyles.accentBg} ${ThemeStyles.accentBtnText} text-6xl font-bebas border-[10px] ${ThemeStyles.border} hover:bg-[#FF0080] hover:text-white transition-all transform hover:-translate-y-2`}
+              >
+                {t('enterTerminal')}
+              </button>
+              <div className={`text-center text-[12px] font-black opacity-50 uppercase tracking-[0.5em] ${ThemeStyles.text}`}>Universal Session Key v3.4.0-Stable</div>
            </div>
         </div>
       </div>
     );
   }
 
-  if (currentView === 'onboarding') {
-    return (
-      <div className={`flex-1 flex flex-col ${isDark ? 'bg-slate-950' : 'bg-slate-50'} h-screen transition-colors`}>
-        <Ticker />
-        <main className="flex-1 p-8 bg-grid flex items-center justify-center">
-          <div className="bg-[#00FF7F] border-[12px] border-black p-16 max-w-4xl w-full text-black">
-            <h2 className="text-9xl font-bebas text-center mb-8">{t('signTalent')}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-               <div className="space-y-4">
-                  <label className="font-black uppercase tracking-widest text-xs">TALENT_ALIAS</label>
-                  <input value={tempStar.userName || ''} onChange={(e) => setTempStar(p => ({...p, userName: e.target.value}))} className="w-full border-4 border-black p-6 text-2xl font-bebas" placeholder="NAME" />
-               </div>
-               <div className="space-y-4">
-                  <label className="font-black uppercase tracking-widest text-xs">NETWORK_ROLE</label>
-                  <input value={tempStar.role || ''} onChange={(e) => setTempStar(p => ({...p, role: e.target.value}))} className="w-full border-4 border-black p-6 text-2xl font-bebas" placeholder="ROLE (e.g. Pop Star)" />
-               </div>
-            </div>
-            <button onClick={() => setCurrentView('customization')} className="w-full btn-flat py-12 bg-black text-white text-6xl font-bebas border-black border-[10px]">{t('assetConfig')}</button>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  if (currentView === 'customization') {
-    return (
-      <div className={`flex-1 flex flex-col ${isDark ? 'bg-slate-950 text-white' : 'bg-slate-50 text-black'} h-screen overflow-hidden transition-colors`}>
-        <Ticker />
-        <header className={`h-24 border-b-8 ${isDark ? 'border-white bg-slate-900' : 'border-black bg-white'} flex items-center justify-between px-8 transition-colors`}>
-          <div className="flex items-center gap-6"><Logo /><span className="font-bebas text-5xl">{t('assetConfig')}</span></div>
-          <div className="flex items-center gap-4"><GlobalControls /><button onClick={() => setCurrentView('roster')} className={`btn-flat ${isDark ? 'bg-white text-black' : 'bg-black text-white'} px-8 py-3 font-bebas text-xl border-4 border-black`}>BACK</button></div>
-        </header>
-        <main className="flex-1 flex flex-col lg:flex-row gap-8 p-8 overflow-hidden bg-grid">
-           <div className={`${isDark ? 'bg-slate-900 border-white' : 'bg-white border-black'} border-[8px] p-8 overflow-y-auto custom-scrollbar flex-1 space-y-12`}>
-              <div className="bg-[#FFFF00] text-black p-4 font-black text-center text-xs uppercase border-4 border-black mb-8">Unlimited Customization Active // Describe Anything Below</div>
-              
-              <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                 {Object.keys(tempStar.appearance || {}).filter(k => !['imageUrl', 'groundingEnabled', 'imageSize', 'aspectRatio'].includes(k)).map(key => (
-                   <div key={key} className="space-y-2 group">
-                      <div className="flex justify-between items-center">
-                        <label className="font-black text-[10px] uppercase opacity-60 group-hover:opacity-100 transition-opacity">{key.replace(/([A-Z])/g, ' $1')}</label>
-                        <button 
-                          onClick={() => enhanceAttribute(key, (tempStar.appearance as any)[key])} 
-                          className={`p-1 hover:text-[#FF0080] transition-colors ${isEnhancing === key ? 'animate-spin' : ''}`}
-                        >
-                          <Sparkles className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <div className="relative">
-                        <input 
-                          list={`list-${key}`}
-                          value={(tempStar.appearance as any)[key]} 
-                          onChange={(e) => setTempStar(p => ({...p, appearance: {...p.appearance!, [key]: e.target.value}}))} 
-                          className="w-full border-4 border-black p-3 font-mono text-xs uppercase bg-slate-50 text-black focus:bg-white focus:border-[#FF0080] transition-all outline-none"
-                        />
-                        <datalist id={`list-${key}`}>
-                           {(INITIAL_INSPIRATIONS[key] || []).map(opt => <option key={opt} value={opt} />)}
-                        </datalist>
-                      </div>
-                   </div>
-                 ))}
-              </section>
-
-              <section className="pt-8 border-t-8 border-black/10 space-y-6">
-                 <h3 className="font-bebas text-4xl">BROADCAST FRAMING</h3>
-                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    {["1:1", "4:3", "16:9", "9:16"].map(ratio => (
-                      <button 
-                        key={ratio}
-                        onClick={() => setTempStar(p => ({...p, appearance: {...p.appearance!, aspectRatio: ratio}}))}
-                        className={`btn-flat p-4 font-bebas text-2xl flex flex-col items-center gap-2 transition-all ${tempStar.appearance?.aspectRatio === ratio ? 'bg-[#FF0080] text-white border-[#000]' : 'bg-white text-black hover:bg-slate-100'}`}
-                      >
-                        <div className={`border-2 border-current mb-1 ${
-                          ratio === '1:1' ? 'w-6 h-6' : 
-                          ratio === '4:3' ? 'w-8 h-6' : 
-                          ratio === '16:9' ? 'w-10 h-6' : 'w-4 h-8'
-                        }`} />
-                        {ratio}
-                      </button>
-                    ))}
-                 </div>
-              </section>
-
-              <section className="pt-8 border-t-8 border-black/10 space-y-6">
-                 <h3 className="font-bebas text-4xl">TECHNICAL SPECS</h3>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                       <label className="font-black text-[10px] uppercase">QUALITY (API KEY REQUIRED FOR 2K/4K)</label>
-                       <select value={tempStar.appearance?.imageSize} onChange={(e) => setTempStar(p => ({...p, appearance: {...p.appearance!, imageSize: e.target.value}}))} className="w-full border-4 border-black p-3 font-bebas text-xl text-black">
-                          {INITIAL_INSPIRATIONS.imageSize.map(s => <option key={s} value={s}>{s}</option>)}
-                       </select>
-                    </div>
-                 </div>
-              </section>
-           </div>
-
-           <aside className="w-full lg:w-[450px] flex flex-col gap-6">
-              <div className="flex-1 bg-black border-8 border-black flex flex-col items-center justify-center p-8 relative group overflow-hidden">
-                 <div className="absolute inset-0 bg-grid opacity-20 pointer-events-none" />
-                 {isGeneratingImage ? <Loader2 className="w-24 h-24 text-[#00FF7F] animate-spin z-10" /> : <Bot className="w-40 h-40 text-slate-800 z-10" />}
-                 <div className="font-bebas text-white text-4xl mt-6 z-10">{isGeneratingImage ? "SYNTHESIZING..." : "READY TO BROADCAST"}</div>
-                 <div className="mt-8 text-[10px] font-mono text-slate-500 uppercase leading-relaxed text-center px-4">
-                    Prompting: {tempStar.userName} as {tempStar.role} in {tempStar.appearance?.studioTheme} studio...
-                 </div>
-              </div>
-              <button disabled={isGeneratingImage} onClick={generateStarAsset} className="w-full btn-flat py-12 bg-[#00FF7F] text-black text-6xl font-bebas border-[10px] border-black hover:bg-[#FF0080] hover:text-white transition-all disabled:opacity-50">
-                 {isGeneratingImage ? "PROCESSING..." : (tempStar.id ? "UPDATE ASSET" : "GENERATE STAR")}
-              </button>
-           </aside>
-        </main>
-      </div>
-    );
-  }
-
-  if (currentView === 'dashboard') {
-    return (
-      <div className={`flex-1 flex flex-col ${isDark ? 'bg-slate-950 text-white' : 'bg-slate-50 text-black'} h-screen overflow-hidden transition-colors`}>
-         <Ticker />
-         <header className={`h-24 border-b-8 ${isDark ? 'border-white bg-slate-900' : 'border-black bg-white'} flex items-center justify-between px-8 transition-colors`}>
-            <div className="flex items-center gap-6">
-              <Logo />
-              <div className="flex flex-col">
-                <span className="font-bebas text-4xl uppercase leading-none">{activeStar?.userName}</span>
-                <span className="font-bebas text-xl text-[#FF0080] leading-none">{activeStar?.role}</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-               <button onClick={() => { setTempStar(activeStar!); setCurrentView('customization'); }} className="btn-flat bg-[#FFFF00] text-black px-6 py-3 font-bebas text-xl border-4 border-black">EDIT TALENT</button>
-               <GlobalControls />
-               <button onClick={() => setCurrentView('roster')} className={`btn-flat ${isDark ? 'bg-white text-black' : 'bg-black text-white'} px-8 py-3 font-bebas text-xl border-4 border-black`}>HUB</button>
-            </div>
-         </header>
-         <main className="flex-1 flex flex-col lg:flex-row gap-6 p-6 overflow-hidden bg-grid">
-            <div className="flex-1 flex flex-col bg-black border-[12px] border-black overflow-hidden relative">
-               {onAir && <div className="absolute inset-0 border-[24px] border-red-600 animate-pulse pointer-events-none z-50" />}
-               <div className="flex-1 flex items-center justify-center relative bg-slate-900 overflow-hidden">
-                  <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--magenta)_0%,_transparent_70%)] animate-pulse" />
-                  {activeStar?.appearance.imageUrl && (
-                    <img src={activeStar.appearance.imageUrl} className={`max-w-full max-h-full object-contain ${onAir ? 'glitch-effect' : ''}`} alt="Broadcast Star" />
-                  )}
-                  {onAir && (
-                    <div className="absolute top-8 left-8 flex flex-col gap-2 z-[60]">
-                       <div className="bg-red-600 text-white font-bebas text-4xl px-6 py-2 border-4 border-black animate-pulse">LIVE FEED</div>
-                       <div className="bg-black/80 text-white font-mono text-xl p-4 border-2 border-white">SYNCING ASSET...</div>
-                    </div>
-                  )}
-               </div>
-               <div className="h-40 bg-slate-900 border-t-8 border-black p-4 grid grid-cols-5 gap-4">
-                  {['PHOTO', 'VIDEO', 'SING', 'DANCE', 'PLAY'].map(a => (
-                     <button key={a} onClick={() => alert("Simulating Activity...")} className="btn-flat bg-slate-800 text-slate-300 font-bebas text-2xl md:text-3xl border-4 border-black hover:bg-[#FF0080] hover:text-white transition-all">{a}</button>
-                  ))}
-               </div>
-            </div>
-            <aside className="w-full lg:w-[450px] flex flex-col gap-6">
-               <div className={`${isDark ? 'bg-slate-900 border-white text-white' : 'bg-white border-black text-black'} border-8 p-6 space-y-4 transition-colors`}>
-                  <div className="flex justify-between items-center"><span className="font-black text-xs opacity-40 uppercase tracking-widest">NETWORK STATUS</span><span className="font-bebas text-4xl text-[#00FF7F]">ONLINE</span></div>
-                  <div className="flex justify-between items-center"><span className="font-black text-xs opacity-40 uppercase tracking-widest">RANK</span><span className="font-bebas text-4xl">LVL {activeStar?.level}</span></div>
-                  <div className="flex justify-between items-center"><span className="font-black text-xs opacity-40 uppercase tracking-widest">TREASURY</span><span className="font-bebas text-5xl text-[#00FF7F]">${activeStar?.earnings.toFixed(2)}</span></div>
-               </div>
-               {!onAir ? (
-                 <button onClick={() => setOnAir(true)} className="w-full btn-flat py-12 bg-[#00FF7F] text-black text-7xl font-bebas border-[12px] border-black hover:scale-105 transition-transform">GO LIVE</button>
-               ) : (
-                 <button onClick={() => setOnAir(false)} className="w-full btn-flat py-12 bg-slate-700 text-white text-7xl font-bebas border-[12px] border-black">OFF AIR</button>
-               )}
-               <div className="flex-1 bg-black border-8 border-black p-6 font-mono text-xs text-[#00FF7F] overflow-y-auto custom-scrollbar flex flex-col gap-4">
-                  <div className="text-white border-b-2 border-[#00FF7F] pb-2 font-black">STUDIO SPECS (UNLIMITED):</div>
-                  {Object.entries(activeStar?.appearance || {}).filter(([k]) => k.startsWith('studio')).map(([k, v]) => (
-                    <div key={k} className="flex flex-col gap-1">
-                      <span className="opacity-50 text-[8px] uppercase">{k}</span>
-                      <span className="text-[10px]">{v as string}</span>
-                    </div>
-                  ))}
-               </div>
-            </aside>
-         </main>
-      </div>
-    );
-  }
-
   if (currentView === 'roster') {
     return (
-      <div className={`flex-1 flex flex-col ${isDark ? 'bg-slate-950 text-white' : 'bg-slate-50 text-black'} h-screen transition-colors`}>
+      <div className={`flex-1 flex flex-col ${ThemeStyles.bg} ${ThemeStyles.text} h-screen transition-colors font-mono`}>
         <Ticker />
-        <Header title={t('talentHub')} />
-        <main className="flex-1 p-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 bg-grid overflow-y-auto">
-          <button onClick={() => { setTempStar({ appearance: DEFAULT_APPEARANCE }); setCurrentView('onboarding'); }} className={`border-8 border-dashed ${isDark ? 'border-slate-700 text-slate-700' : 'border-slate-300 text-slate-300'} flex flex-col items-center justify-center p-12 hover:bg-[#FF0080]/10 hover:border-[#FF0080] transition-all h-[450px]`}>
-            <PlusCircle className="w-20 h-20" /><span className="font-bebas text-4xl mt-8">{t('signTalent')}</span>
+        <header className={`h-28 border-b-8 flex items-center justify-between px-10 sticky top-0 z-[100] transition-colors ${isDark ? 'border-white bg-[#020617]' : 'border-black bg-white'}`}>
+          <div className="flex items-center gap-8">
+            <Logo className="w-16 h-16" />
+            <h1 className={`font-bebas uppercase text-7xl tracking-tight leading-none ${ThemeStyles.text}`}>{t('talentHub')}</h1>
+          </div>
+          <div className="flex items-center gap-6">
+            <button onClick={() => setCurrentView('donation')} className={`btn-flat bg-[#00FF7F] text-black px-10 py-3 font-bebas text-3xl border-4 border-black hover:bg-white`}>SUPPORT</button>
+            <GlobalControls />
+            <button onClick={() => setCurrentView('home')} className={`btn-flat ${ThemeStyles.accentBg} ${ThemeStyles.accentBtnText} px-10 py-3 font-bebas text-3xl border-4 ${ThemeStyles.border}`}>HOME</button>
+          </div>
+        </header>
+        <main className="flex-1 p-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-16 overflow-y-auto relative custom-scrollbar">
+          <button 
+            onClick={() => { announce("Preparing talent contract."); }} 
+            className={`border-[10px] border-dashed ${isDark ? 'border-slate-700 text-slate-700' : 'border-slate-300 text-slate-400'} flex flex-col items-center justify-center p-14 hover:bg-[#FF0080]/10 hover:border-[#FF0080] hover:text-[#FF0080] transition-all h-[580px] group`}
+          >
+            <PlusCircle className="w-32 h-32 group-hover:scale-110 transition-transform duration-300" />
+            <span className="font-bebas text-6xl mt-12 tracking-tight uppercase">{t('signTalent')}</span>
           </button>
           {gameState.roster.map(star => (
-            <div key={star.id} className={`${isDark ? 'bg-slate-900 border-white text-white' : 'bg-white border-black text-black'} border-8 flex flex-col overflow-hidden h-[450px] group transition-all`}>
-              <div onClick={() => { setGameState(p => ({...p, activeStarId: star.id})); setCurrentView('dashboard'); }} className="flex-1 bg-black overflow-hidden cursor-pointer relative">
-                {star.appearance.imageUrl && <img src={star.appearance.imageUrl} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700" alt={star.userName} />}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <Play className="w-24 h-24 text-white" />
-                </div>
+            <div key={star.id} className={`${ThemeStyles.surface} border-[8px] ${ThemeStyles.border} ${ThemeStyles.text} flex flex-col overflow-hidden h-[580px] group transition-all hover:scale-[1.03]`}>
+              <div className="flex-1 bg-black flex items-center justify-center overflow-hidden relative">
+                 <div className="absolute top-6 left-6 z-20 bg-[#00FF7F] text-black px-4 py-2 text-[12px] font-black uppercase tracking-[0.2em] border-2 border-black">SYNC_LIVE</div>
+                 {star.appearance.imageUrl ? (
+                    <img src={star.appearance.imageUrl} alt={star.userName} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                 ) : (
+                    <Bot className="w-40 h-40 text-white/10 group-hover:text-[#FF0080]/40 transition-colors" />
+                 )}
               </div>
-              <div className={`p-6 border-t-8 ${isDark ? 'border-white' : 'border-black'} flex justify-between items-center bg-inherit`}>
-                 <div className="flex flex-col">
-                    <h3 className="text-3xl font-bebas truncate max-w-[150px]">{star.userName}</h3>
-                    <span className="text-[#FF0080] font-black text-[10px] tracking-widest">${star.earnings.toFixed(2)} EARNED</span>
+              <div className={`p-10 border-t-8 ${ThemeStyles.border} flex justify-between items-center bg-inherit`}>
+                 <div className="flex flex-col gap-2">
+                    <h3 className="text-5xl font-bebas leading-none tracking-tight uppercase group-hover:text-[#FF0080] transition-colors">{star.userName}</h3>
+                    <span className="text-[12px] font-black uppercase opacity-60 tracking-[0.3em]">{star.role}</span>
                  </div>
-                 <div className="flex gap-2">
-                    <button onClick={() => { setTempStar(star); setCurrentView('customization'); }} className="p-3 border-2 border-black hover:bg-[#FFFF00] hover:text-black transition-colors"><Edit3 className="w-5 h-5" /></button>
-                    <button onClick={() => setGameState(p => ({...p, roster: p.roster.filter(s => s.id !== star.id)}))} className="p-3 border-2 border-black hover:bg-red-600 hover:text-white transition-colors"><Trash2 className="w-5 h-5" /></button>
-                 </div>
+                 <button className="p-5 border-4 border-current hover:bg-[#FFFF00] hover:text-black transition-all hover:scale-110 active:scale-95">
+                    <Cast className="w-8 h-8" />
+                 </button>
               </div>
             </div>
           ))}
@@ -609,42 +683,12 @@ const MyTVStar = () => {
     );
   }
 
-  if (currentView === 'settings') {
-    return (
-      <div className={`flex-1 flex flex-col ${isDark ? 'bg-slate-950 text-white' : 'bg-slate-50 text-black'} h-screen transition-colors`}>
-        <Ticker />
-        <Header title={t('settings')} showSettings={false} />
-        <main className="flex-1 p-8 md:p-16 max-w-5xl mx-auto w-full space-y-8 bg-grid overflow-y-auto">
-           <div className={`${isDark ? 'bg-slate-900 border-white' : 'bg-white border-black'} border-[8px] p-8 md:p-12 space-y-12 transition-colors`}>
-             <section className="space-y-6">
-                <label className="text-xs font-black text-[#FF0080] uppercase tracking-widest block">{t('language')}</label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  {LANGUAGES_LIST.map(lang => (
-                    <button key={lang.code} onClick={() => setGameState(p => ({...p, language: lang.code}))} className={`btn-flat p-4 font-bebas text-xl border-4 border-black transition-all ${gameState.language === lang.code ? 'bg-[#FFFF00] text-black' : (isDark ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-slate-100 text-black hover:bg-white')}`}>{lang.label}</button>
-                  ))}
-                </div>
-             </section>
-             <section className="space-y-6">
-                <label className="text-xs font-black text-[#FF0080] uppercase tracking-widest block">{t('theme')}</label>
-                <div className="grid grid-cols-2 gap-4 max-w-md">
-                   <button onClick={() => setGameState(p => ({...p, theme: 'light'}))} className={`btn-flat p-6 font-bebas text-3xl border-4 border-black flex items-center justify-center gap-4 transition-all ${!isDark ? 'bg-[#00FF7F] text-black' : 'bg-slate-800 text-white'}`}><Sun /> {t('light')}</button>
-                   <button onClick={() => setGameState(p => ({...p, theme: 'dark'}))} className={`btn-flat p-6 font-bebas text-3xl border-4 border-black flex items-center justify-center gap-4 transition-all ${isDark ? 'bg-[#FF0080] text-white' : 'bg-slate-800 text-white'}`}><Moon /> {t('dark')}</button>
-                </div>
-             </section>
-             <div className="pt-12 border-t-4 border-black/10">
-                <button onClick={() => setCurrentView('roster')} className={`w-full btn-flat py-8 ${isDark ? 'bg-white text-black' : 'bg-black text-white'} border-4 border-black text-3xl font-bebas uppercase transition-all`}>BACK TO HUB</button>
-             </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
   return (
-    <div className="fixed bottom-8 right-8 z-[200] flex flex-col items-end gap-4 pointer-events-none">
+    <div className="fixed bottom-12 right-12 z-[300] flex flex-col items-end gap-8 pointer-events-none">
        {showPayoutToast && (
-          <div className="bg-[#00FF7F] border-4 border-black p-6 font-bebas text-3xl text-black animate-in slide-in-from-right-12 pointer-events-auto">
-             <DollarSign className="w-8 h-8 inline mr-2" />{payoutMessage}
+          <div className={`bg-[#00FF7F] border-[10px] border-black p-10 font-bebas text-5xl text-black animate-in slide-in-from-right-20 pointer-events-auto flex items-center gap-8 shadow-[0_0_50px_rgba(0,255,127,0.3)]`}>
+             <div className="p-4 bg-black text-[#00FF7F] border-4 border-white"><DollarSign className="w-12 h-12" /></div>
+             {payoutMessage}
           </div>
        )}
     </div>
