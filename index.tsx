@@ -50,7 +50,9 @@ import {
   BarChart4,
   Hash,
   ChevronRight,
-  Info
+  Info,
+  Building2,
+  Briefcase
 } from 'lucide-react';
 
 // --- Internationalization (i18n) ---
@@ -122,13 +124,15 @@ const TRANSLATIONS: Record<string, any> = {
     universalSupport: "SUPPORTS ALL BANKS & E-WALLETS",
     allCurrencies: "MULTI-CURRENCY AUTO-CONVERSION",
     accountDetails: "ACCOUNT DETAILS",
-    bankName: "PAYPAL (dhea_wasisto@yahoo.com)",
+    bankName: "BANK JAGO (107863277869)",
     accountNo: "E-WALLET (+628567239000)",
     confirmPayment: "CONFIRM DEPOSIT",
     processing: "PROCESSING TRANSACTION...",
     customAmount: "CUSTOM AMOUNT",
     enterAmount: "ENTER USD AMOUNT",
-    wallets: "GOPAY / OVO / SHOPEEPAY"
+    wallets: "GOPAY / OVO / SHOPEEPAY",
+    corporateTitle: "CORPORATE & ORGANIZATIONS",
+    corporateDesc: "My TV Star allows donations from big companies and organizations to scale our broadcast infrastructure globally."
   },
 };
 
@@ -290,7 +294,6 @@ const MyTVStar = () => {
           </nav>
 
           <main className="flex-1 flex flex-col items-center justify-center py-28 px-10 text-center relative overflow-hidden">
-            {/* Visual Flare */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1400px] h-[1400px] bg-[#FF0080]/5 rounded-full blur-[200px] pointer-events-none" />
             
             <div className="z-10 flex flex-col items-center max-w-7xl w-full">
@@ -303,7 +306,6 @@ const MyTVStar = () => {
               </h2>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-stretch justify-center w-full mb-28">
-                 {/* Feature Card 1 */}
                  <div className={`border-4 ${ThemeStyles.cardBorder} p-12 ${ThemeStyles.surface} flex flex-col items-center text-center relative group transition-all hover:scale-[1.02] border-t-[12px] border-t-[#00FF7F]`}>
                     <div className="p-4 bg-black text-[#00FF7F] mb-8 border-4 border-[#00FF7F]">
                         <DollarSign className="w-14 h-14" />
@@ -312,7 +314,6 @@ const MyTVStar = () => {
                     <p className="text-sm uppercase opacity-80 leading-relaxed font-black tracking-widest max-w-xs">{t('rewardDesc')}</p>
                  </div>
 
-                 {/* Main CTA */}
                  <div className="flex flex-col gap-12 items-center justify-center bg-black/5 dark:bg-white/5 p-12 border-4 border-dashed border-current">
                     <button 
                       onClick={() => isLoggedIn ? setCurrentView('roster') : setCurrentView('login')} 
@@ -326,7 +327,6 @@ const MyTVStar = () => {
                     </div>
                  </div>
 
-                 {/* Feature Card 2 */}
                  <div className={`border-4 ${ThemeStyles.cardBorder} p-12 ${ThemeStyles.surface} flex flex-col items-center text-center relative group transition-all hover:scale-[1.02] border-t-[12px] border-t-[#FF0080]`}>
                     <div className="p-4 bg-black text-[#FF0080] mb-8 border-4 border-[#FF0080]">
                         <Cpu className="w-14 h-14" />
@@ -336,7 +336,6 @@ const MyTVStar = () => {
                  </div>
               </div>
 
-              {/* Enhanced Platform Strip */}
               <div className={`w-full py-14 border-y-[8px] ${ThemeStyles.border} overflow-hidden bg-slate-200/50 dark:bg-slate-900/80`}>
                  <div className="whitespace-nowrap flex items-center gap-40 animate-marquee opacity-60 hover:opacity-100 transition-opacity">
                     {[...PLATFORMS, ...PLATFORMS].map((p, i) => (
@@ -350,7 +349,6 @@ const MyTVStar = () => {
             </div>
           </main>
 
-          {/* Network Section - High Visibility Table */}
           <section className={`py-40 px-12 bg-black text-white relative`}>
              <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-32 items-start">
                 <div className="space-y-16">
@@ -375,16 +373,13 @@ const MyTVStar = () => {
                    </div>
                 </div>
 
-                {/* Professional Data Terminal */}
                 <div className="flex flex-col border-[10px] border-white/30 bg-white/5 backdrop-blur-xl overflow-hidden w-full transition-all hover:border-white">
-                    {/* Header Row */}
                     <div className="flex items-center p-10 border-b-[8px] border-white/20 bg-white/10 font-black text-[12px] uppercase tracking-[0.5em] text-[#00FF7F]">
                         <div className="w-16 shrink-0 flex justify-center"><Hash className="w-6 h-6" /></div>
                         <div className="flex-1 px-6">PROTOCOL DISTRIBUTION PATH</div>
                         <div className="w-32 text-right">LOAD %</div>
                     </div>
                     
-                    {/* Rows */}
                     {[
                       { label: 'PLAYER REVENUES', val: '40', icon: DollarSign, color: 'text-[#00FF7F]', barColor: 'bg-[#00FF7F]', width: 'w-[40%]' },
                       { label: 'NODE INFRASTRUCTURE', val: '20', icon: Activity, color: 'text-[#FFFF00]', barColor: 'bg-[#FFFF00]', width: 'w-[20%]' },
@@ -402,7 +397,6 @@ const MyTVStar = () => {
                                   <span className="font-bebas text-5xl tracking-widest group-hover:text-[#FFFF00] transition-colors uppercase">{item.label}</span>
                                   <span className={`font-bebas text-6xl leading-none ${item.color} hidden sm:block`}>{item.val}%</span>
                               </div>
-                              {/* Heavy Duty Bar */}
                               <div className="h-4 w-full bg-white/10 border-2 border-white/20 relative overflow-hidden">
                                   <div className={`absolute top-0 left-0 h-full ${item.barColor} ${item.width} transition-all duration-1000 ease-in-out group-hover:brightness-125 shadow-[0_0_20px_rgba(255,255,255,0.2)]`} />
                               </div>
@@ -414,7 +408,6 @@ const MyTVStar = () => {
                       </div>
                     ))}
                     
-                    {/* Aggregated Footer */}
                     <div className="p-12 bg-[#00FF7F] text-black flex justify-between items-center group cursor-default">
                         <div className="flex items-center gap-8">
                             <div className="p-6 bg-black text-[#00FF7F] border-4 border-white transform hover:rotate-6 transition-transform">
@@ -457,17 +450,15 @@ const MyTVStar = () => {
     );
   }
 
-  // --- Other views preserved with High Visibility Focus ---
-
   if (currentView === 'donation') {
     const fixedTiers = [
-      { amount: "$1.00", label: "MICRO DONATION", icon: Zap },
-      { amount: "$2.00", label: "BASIC SUPPORT", icon: Coins },
-      { amount: "$5.00", label: "NETWORK FUEL", icon: Activity },
-      { amount: "$10.00", label: "BOOSTER", icon: Signal },
-      { amount: "$20.00", label: "PRO SUPPORTER", icon: Shield },
-      { amount: "$50.00", label: "STUDIO PARTNER", icon: Trophy },
-      { amount: "$100.00", label: "EXECUTIVE PRODUCER", icon: Star }
+      { amount: "1 USD", label: "MICRO DONATION", icon: Zap },
+      { amount: "2 USD", label: "BASIC SUPPORT", icon: Coins },
+      { amount: "5 USD", label: "NETWORK FUEL", icon: Activity },
+      { amount: "10 USD", label: "BOOSTER", icon: Signal },
+      { amount: "20 USD", label: "PRO SUPPORTER", icon: Shield },
+      { amount: "50 USD", label: "STUDIO PARTNER", icon: Trophy },
+      { amount: "100 USD", label: "EXECUTIVE PRODUCER", icon: Star }
     ];
 
     return (
@@ -485,7 +476,9 @@ const MyTVStar = () => {
             <section className="text-center space-y-10">
                <div className="inline-block bg-[#FF0080] text-white font-bebas text-3xl px-12 py-3 border-4 border-black mb-6">{t('supportTagline')}</div>
                <h2 className={`font-bebas text-9xl md:text-[12rem] leading-none tracking-tighter`}>COMMUNITY <span className="text-[#00FF7F]">TREASURY</span></h2>
-               <p className="text-lg uppercase opacity-80 max-w-3xl mx-auto font-black tracking-widest leading-relaxed">{t('supportDesc')}</p>
+               <p className="text-lg uppercase opacity-80 max-w-3xl mx-auto font-black tracking-widest leading-relaxed">
+                  CONTRIBUTE TO SCALE THE NETWORK. WE SUPPORT ALL CURRENCIES VIA AUTOMATIC AUTO-CONVERSION.
+               </p>
             </section>
 
             <section className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -511,12 +504,29 @@ const MyTVStar = () => {
                 className={`flex flex-col items-center justify-center p-12 border-4 ${ThemeStyles.border} transition-all hover:bg-[#FF0080] hover:text-white hover:scale-105 active:scale-95 group bg-inherit`}
                >
                   <MousePointer2 className="w-16 h-16 mb-6 group-hover:rotate-12 transition-transform" />
-                  <span className="font-bebas text-6xl leading-none">{t('customAmount')}</span>
-                  <span className="text-[11px] font-black uppercase tracking-widest mt-4 opacity-70 group-hover:opacity-100">ANY VALUE</span>
+                  <span className="font-bebas text-6xl leading-none">CUSTOM</span>
+                  <span className="text-[11px] font-black uppercase tracking-widest mt-4 opacity-70 group-hover:opacity-100">ANY AMOUNT</span>
                </button>
             </section>
 
-            {/* High Visibility QR Section */}
+            {/* Corporate Section */}
+            <section className={`p-14 border-[12px] border-dashed ${ThemeStyles.border} ${ThemeStyles.surface} flex flex-col md:flex-row items-center gap-12 relative overflow-hidden`}>
+                <div className="bg-black text-white p-8 border-4 border-[#00FF7F] shrink-0">
+                    <Briefcase className="w-20 h-20" />
+                </div>
+                <div className="space-y-4">
+                    <h3 className="font-bebas text-5xl text-[#00FF7F] leading-none uppercase">{t('corporateTitle')}</h3>
+                    <p className="text-lg uppercase font-black opacity-80 tracking-widest leading-relaxed">
+                        {t('corporateDesc')}
+                    </p>
+                    <div className="flex items-center gap-4 text-[10px] font-black opacity-60 uppercase tracking-widest">
+                        <CheckCircle2 className="w-4 h-4" /> Official Invoicing Available
+                        <CheckCircle2 className="w-4 h-4" /> Priority Global Support
+                        <CheckCircle2 className="w-4 h-4" /> Network Partner Status
+                    </div>
+                </div>
+            </section>
+
             <section className={`p-14 border-[12px] ${ThemeStyles.border} ${ThemeStyles.surface} grid grid-cols-1 lg:grid-cols-2 gap-20 relative overflow-hidden`}>
                 <div className="space-y-12 relative z-10">
                     <div className="flex items-center gap-8 border-b-8 border-current pb-10">
@@ -527,39 +537,36 @@ const MyTVStar = () => {
                         <ShieldCheck className="w-12 h-12 shrink-0" />
                         <div>
                             {t('universalSupport')}<br/>
-                            {t('allCurrencies')} - NO EXTRA FEES
+                            AUTO-CONVERSION FOR ALL LOCAL CURRENCIES ENABLED.
                         </div>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-                        <div className="space-y-10">
-                            <div className="flex flex-col gap-4">
-                                <span className="text-[12px] font-black opacity-60 uppercase tracking-[0.3em] border-l-4 border-[#FF0080] pl-3">PAYPAL ACCOUNT</span>
+                    <div className="flex flex-col gap-12">
+                        <div className="flex flex-col gap-6">
+                            <div className="flex flex-col gap-2">
+                                <span className="text-[11px] font-black opacity-60 uppercase tracking-[0.3em] border-l-4 border-[#FF0080] pl-3">PAYPAL ACCOUNT</span>
                                 <div className="flex items-center gap-5">
                                     <div className="p-4 bg-blue-600 border-4 border-black text-white"><CreditCard className="w-10 h-10" /></div>
-                                    <span className="font-bebas text-3xl truncate tracking-wide text-blue-600 underline">dhea_wasisto@yahoo.com</span>
+                                    <span className="font-bebas text-3xl tracking-wide text-blue-600 font-bold underline">dhea_wasisto@yahoo.com</span>
                                 </div>
                             </div>
-                            <div className="flex flex-col gap-4">
-                                <span className="text-[12px] font-black opacity-60 uppercase tracking-[0.3em] border-l-4 border-[#00FF7F] pl-3">E-WALLETS RECIPIENT</span>
+                            
+                            <div className="flex flex-col gap-2">
+                                <span className="text-[11px] font-black opacity-60 uppercase tracking-[0.3em] border-l-4 border-[#00FFFF] pl-3">BANK JAGO (DIRECT)</span>
+                                <div className="flex items-center gap-5">
+                                    <div className="p-4 bg-orange-500 border-4 border-black text-white"><Building2 className="w-10 h-10" /></div>
+                                    <span className="font-bebas text-5xl tracking-[0.1em] text-orange-600 bg-white border-2 border-orange-600 px-4 py-1">107863277869</span>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <span className="text-[11px] font-black opacity-60 uppercase tracking-[0.3em] border-l-4 border-[#00FF7F] pl-3">E-WALLETS RECIPIENT</span>
                                 <div className="flex items-center gap-5">
                                     <div className="p-4 bg-[#00FF7F] border-4 border-black text-black"><SmartphoneNfc className="w-10 h-10" /></div>
                                     <span className="font-bebas text-4xl tracking-wide text-[#00FF7F] bg-black px-4 py-1">+628567239000</span>
                                 </div>
-                                <span className="text-[11px] font-black opacity-80 tracking-widest mt-2">{t('wallets')} (GOPAY/OVO)</span>
+                                <span className="text-[11px] font-black opacity-80 tracking-widest mt-2">SUPPORTS: GOPAY / OVO / SHOPEEPAY / DANA</span>
                             </div>
-                        </div>
-
-                        <div className="space-y-10">
-                             <div className="p-8 border-4 border-black bg-white text-black text-[13px] font-black flex flex-col gap-5 uppercase tracking-widest">
-                                <div className="flex items-center gap-4"><Globe className="w-6 h-6 text-blue-600" /> MULTI-CURRENCY SUPPORT</div>
-                                <div className="flex items-center gap-4"><CheckCircle2 className="w-6 h-6 text-green-600" /> INSTANT VERIFICATION</div>
-                             </div>
-                             <div className="flex gap-4 flex-wrap">
-                                 {['GoPay', 'OVO', 'ShopeePay', 'DANA', 'Bank Jago'].map(p => (
-                                     <span key={p} className="px-5 py-2.5 bg-black text-white font-black text-[11px] border-2 border-white/20 uppercase tracking-[0.2em]">{p}</span>
-                                 ))}
-                             </div>
                         </div>
                     </div>
                 </div>
@@ -568,7 +575,6 @@ const MyTVStar = () => {
                     <div className="absolute top-0 left-0 w-full h-full opacity-20 bg-[radial-gradient(circle_at_center,_var(--green)_0%,_transparent_70%)] animate-pulse pointer-events-none" />
                     <div className="bg-white p-10 border-[6px] border-[#00FF7F] relative transition-transform duration-500 group-hover:scale-110">
                         <div className="w-72 h-72 flex items-center justify-center relative">
-                            {/* Realistic QR Visualization */}
                             <div className="grid grid-cols-12 grid-rows-12 gap-0.5 w-full h-full p-2">
                                 {Array.from({length: 144}).map((_, i) => (
                                     <div key={i} className={`bg-black ${Math.random() > 0.4 ? 'opacity-100' : 'opacity-10'}`} />
@@ -580,7 +586,7 @@ const MyTVStar = () => {
                         </div>
                     </div>
                     <span className="text-[#00FF7F] font-bebas text-4xl mt-14 animate-pulse tracking-[0.3em]">{t('scanQr')}</span>
-                    <span className="text-white/50 text-[11px] font-black uppercase mt-5 tracking-[0.5em]">UNIVERSAL BROADCAST GATEWAY ENABLED</span>
+                    <span className="text-white/50 text-[11px] font-black uppercase mt-5 tracking-[0.5em]">UNIVERSAL QR GATEWAY // ALL APPS SYNCED</span>
                 </div>
             </section>
          </main>
@@ -594,7 +600,6 @@ const MyTVStar = () => {
     );
   }
 
-  // Login and Roster screens benefit from the high-visibility styling
   if (currentView === 'login') {
     return (
       <div className={`flex-1 flex flex-col ${ThemeStyles.bg} h-screen transition-colors font-mono`}>
@@ -691,6 +696,90 @@ const MyTVStar = () => {
              {payoutMessage}
           </div>
        )}
+       {selectedTier && (
+             <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/95 p-6 backdrop-blur-sm pointer-events-auto">
+                <div className={`${ThemeStyles.surface} border-[12px] ${ThemeStyles.border} p-12 max-w-4xl w-full space-y-8 animate-in zoom-in-95 duration-200 overflow-y-auto max-h-screen custom-scrollbar`}>
+                    <div className="flex justify-between items-start border-b-8 border-current pb-8">
+                        <div>
+                            {selectedTier.isCustom ? (
+                                <div className="space-y-2">
+                                    <h3 className="font-bebas text-6xl text-[#FF0080]">{t('customAmount')}</h3>
+                                    <div className="relative">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 font-bebas text-4xl opacity-50">$</div>
+                                        <input 
+                                            autoFocus
+                                            type="number"
+                                            placeholder="0.00"
+                                            value={customAmountInput}
+                                            onChange={(e) => setCustomAmountInput(e.target.value)}
+                                            className={`w-full border-4 ${ThemeStyles.border} p-6 pl-12 text-5xl font-bebas bg-slate-100 dark:bg-slate-800 text-current outline-none focus:border-[#00FF7F]`}
+                                        />
+                                    </div>
+                                </div>
+                            ) : (
+                                <>
+                                    <h3 className="font-bebas text-7xl text-[#FF0080]">{selectedTier.amount}</h3>
+                                    <span className="text-sm font-black uppercase tracking-widest opacity-50">{selectedTier.label}</span>
+                                </>
+                            )}
+                        </div>
+                        <button onClick={() => { setSelectedTier(null); setCustomAmountInput(''); }} className="p-4 bg-red-600 text-white border-4 border-black hover:bg-black transition-colors">
+                            <X className="w-10 h-10" />
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center bg-black/5 p-8 border-4 border-dashed border-current">
+                        <div className="space-y-6">
+                            <div className="flex flex-col gap-1">
+                                <span className="text-[10px] font-black uppercase opacity-60">PAYPAL ACCOUNT</span>
+                                <div className="font-bebas text-3xl text-blue-600 underline">dhea_wasisto@yahoo.com</div>
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <span className="text-[10px] font-black uppercase opacity-60">BANK JAGO ACCOUNT</span>
+                                <div className="font-bebas text-4xl text-orange-600 font-bold">107863277869</div>
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <span className="text-[10px] font-black uppercase opacity-60">E-WALLET / MOBILE</span>
+                                <div className="font-bebas text-3xl text-[#00FF7F] tracking-widest">+628567239000</div>
+                                <span className="text-[10px] opacity-70">GOPAY / OVO / DANA</span>
+                            </div>
+                        </div>
+                        <div className="flex flex-col items-center bg-black p-8 border-4 border-white">
+                             <div className="w-48 h-48 bg-white p-2 grid grid-cols-10 grid-rows-10 gap-px">
+                                {Array.from({length: 100}).map((_, i) => (
+                                    <div key={i} className={`bg-black ${Math.random() > 0.4 ? 'opacity-100' : 'opacity-10'}`} />
+                                ))}
+                             </div>
+                             <span className="text-[#00FF7F] text-[9px] font-black uppercase mt-5 text-center tracking-widest">SCAN UNIVERSAL QR GATEWAY</span>
+                        </div>
+                    </div>
+
+                    <button 
+                        disabled={isProcessingPayment || (selectedTier.isCustom && (!customAmountInput || parseFloat(customAmountInput) <= 0))}
+                        onClick={() => {
+                            setIsProcessingPayment(true);
+                            announce(t('processing'));
+                            const finalAmount = selectedTier.isCustom ? `${parseFloat(customAmountInput).toFixed(2)} USD` : selectedTier.amount;
+                            setTimeout(() => {
+                                setPayoutMessage(`CONTRIBUTION LOGGED: ${finalAmount}`);
+                                setShowPayoutToast(true);
+                                setSelectedTier(null);
+                                setCustomAmountInput('');
+                                setIsProcessingPayment(false);
+                                announce(t('thankYou'));
+                                setTimeout(() => setShowPayoutToast(false), 5000);
+                            }, 2500);
+                        }}
+                        className={`w-full btn-flat py-12 ${ThemeStyles.accentBg} ${ThemeStyles.accentBtnText} text-6xl font-bebas border-8 ${ThemeStyles.border} hover:bg-[#00FF7F] hover:text-black transition-all disabled:opacity-50`}
+                    >
+                        {isProcessingPayment ? t('processing') : t('confirmPayment')}
+                    </button>
+                    <div className="text-center text-[11px] font-black opacity-40 uppercase tracking-[0.2em]">
+                       UNIVERSAL BROADCAST SYNC // LOCAL CURRENCIES SUPPORTED
+                    </div>
+                </div>
+             </div>
+         )}
     </div>
   );
 };
