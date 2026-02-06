@@ -1,785 +1,599 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
 import { GoogleGenAI, Type } from "@google/genai";
 import { 
   Tv, 
-  Monitor, 
-  Globe, 
-  Loader2, 
   PlusCircle, 
   Bot, 
-  Maximize2, 
   Signal,
-  Shield,
-  Play,
-  Zap,
   DollarSign,
   Sun,
   Moon,
-  Settings2,
-  Edit3,
-  Trash2,
   CheckCircle2,
   Activity,
-  Sparkles,
-  Volume2,
   Smartphone,
   Gamepad2,
   Cpu,
   Trophy,
-  HardDrive,
-  Accessibility,
-  Ear,
-  Keyboard as KeyboardIcon,
-  PieChart,
   Heart,
   Coins,
-  ArrowRight,
   QrCode,
   CreditCard,
-  Wallet,
-  Banknote,
+  SmartphoneNfc,
+  Cast,
+  Star,
+  BarChart4,
+  Hash,
   X,
   MousePointer2,
   ShieldCheck,
-  SmartphoneNfc,
-  Cast,
-  LayoutGrid,
-  Star,
-  List,
-  BarChart4,
-  Hash,
-  ChevronRight,
-  Info,
   Building2,
-  Briefcase
+  Briefcase,
+  ChevronRight,
+  Globe,
+  Loader2,
+  Sparkles,
+  Zap,
+  Play,
+  ArrowUpRight,
+  ExternalLink
 } from 'lucide-react';
 
-// --- Internationalization (i18n) ---
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
 const TRANSLATIONS: Record<string, any> = {
   en: { 
     appTitle: "MY TV STAR", 
-    tagline: "THE ULTIMATE BROADCASTING SIMULATION", 
+    tagline: "ULTIMATE BROADCAST SIMULATION", 
     startSim: "START SIMULATION", 
     login: "LOGIN", 
     enterHub: "ENTER HUB",
     identitySync: "IDENTITY SYNC", 
-    enterTerminal: "ENTER TERMINAL", 
-    hub: "HUB", 
-    live: "LIVE", 
-    revenue: "REVENUE", 
-    goLive: "GO LIVE", 
-    endStream: "END STREAM", 
-    treasury: "TREASURY", 
-    settings: "SETTINGS", 
-    language: "LANGUAGE", 
+    enterTerminal: "PRODUCER LOGIN", 
     talentHub: "TALENT HUB", 
-    signTalent: "SIGN NEW TALENT", 
-    assetConfig: "ASSET CONFIG", 
-    generateStar: "GENERATE STAR", 
-    updateStar: "RE-GENERATE ASSET",
-    stats: "STAR STATS", 
-    lvl: "LVL", 
-    earnings: "EARNINGS", 
-    theme: "APPEARANCE MODE",
-    light: "LIGHT MODE",
-    dark: "DARK MODE",
-    studioMaster: "STUDIO MASTER",
-    aspectRatio: "ASPECT RATIO",
-    resolution: "RESOLUTION",
-    enhance: "ENHANCE WITH AI",
-    editStar: "EDIT TALENT",
-    unlimited: "UNLIMITED MODE",
-    platformAvailability: "PLATFORM DEPLOYMENT STATUS",
-    optimized: "OPTIMIZED FOR ALL DEVICES",
-    rewardTitle: "REWARD ENGINE ACTIVE",
-    rewardDesc: "Earn $5.00 every 10 minutes of network uptime. Your talent, your empire, your revenue.",
-    unlimitedTitle: "UNLIMITED CREATIVITY",
-    unlimitedDesc: "Customizable everything. Any body size, any style, any studio. Powered by Gemini AI.",
-    systemReqs: "SYSTEM REQUIREMENTS",
-    ramMin: "2GB RAM MINIMUM",
-    ramRec: "4GB RAM RECOMMENDED",
-    accessibility: "ACCESSIBILITY HUB",
-    voiceGuidance: "VOICE GUIDANCE",
-    closedCaptions: "CLOSED CAPTIONS",
-    largeText: "ENHANCED LEGIBILITY",
-    kbShortcuts: "KEYBOARD SHORTCUTS",
-    narratorOn: "Narrator Active. Hover over elements for audio guidance.",
-    narratorOff: "Narrator Disabled.",
-    financialTitle: "FINANCIAL TRANSPARENCY",
-    fundingModel: "FUNDING DISTRIBUTION MODEL",
-    playerPayouts: "PLAYER PAYOUTS",
-    maintenance: "MAINTENANCE",
-    development: "DEVELOPMENT",
-    siteOwner: "PLATFORM OWNER",
-    donationInfo: "My TV Star is funded by community donations. Here is how every dollar is distributed to keep the network alive:",
+    signTalent: "NEW CONTRACT", 
+    rewardTitle: "REWARD ENGINE",
+    rewardDesc: "Earn $5.00 every 10 minutes of network uptime. Your talent, your empire.",
     donationPageTitle: "NETWORK SUPPORT",
-    supportTagline: "FUEL THE BROADCAST EMPIRE",
-    donateNow: "SEND DONATION",
-    selectTier: "SELECT CONTRIBUTION TIER",
-    thankYou: "THANK YOU FOR YOUR SUPPORT!",
-    supportDesc: "Your contributions ensure we can maintain a high-quality global network for all stars.",
-    paymentTerminal: "PAYMENT TERMINAL",
-    scanQr: "SCAN UNIVERSAL QR CODE",
-    universalSupport: "SUPPORTS ALL BANKS & E-WALLETS",
-    allCurrencies: "MULTI-CURRENCY AUTO-CONVERSION",
-    accountDetails: "ACCOUNT DETAILS",
-    bankName: "BANK JAGO (107863277869)",
-    accountNo: "E-WALLET (+628567239000)",
-    confirmPayment: "CONFIRM DEPOSIT",
-    processing: "PROCESSING TRANSACTION...",
-    customAmount: "CUSTOM AMOUNT",
-    enterAmount: "ENTER USD AMOUNT",
-    wallets: "GOPAY / OVO / SHOPEEPAY",
-    corporateTitle: "CORPORATE & ORGANIZATIONS",
-    corporateDesc: "My TV Star allows donations from big companies and organizations to scale our broadcast infrastructure globally."
+    supportTagline: "FUEL THE EMPIRE",
+    supportDesc: "Direct contributions scale our global broadcast node infrastructure. We support all currencies including corporate funding.",
+    paymentTerminal: "PAYMENT GATEWAY",
+    scanQr: "SCAN UNIVERSAL QR",
+    universalSupport: "SUPPORTS ALL BANKS & WALLETS",
+    allCurrencies: "MULTI-CURRENCY ENABLED",
+    wallets: "GOPAY / OVO / SHOPEEPAY / DANA",
+    corporateTitle: "CORPORATE PARTNERS",
+    corporateDesc: "Scalable infrastructure support for big companies and organizations to fund global broadcast nodes."
   },
 };
 
-type View = 'home' | 'login' | 'onboarding' | 'customization' | 'dashboard' | 'settings' | 'roster' | 'donation';
+type View = 'home' | 'login' | 'roster' | 'donation' | 'studio';
 
 interface StarAppearance {
-  ageGroup: string; gender: string; skintone: string; bodySize: string; hairstyle: string; hairColor: string; eyeColor: string; pose: string; top: string; bottom: string; footwear: string; makeup: string; headwear: string; accessories: string; primaryColor: string; secondaryColor: string; imageUrl?: string; studioFurniture: string; studioProps: string; studioLighting: string; studioBackdrop: string; studioSound: string; studioFX: string; studioAudience: string; studioFlooring: string; studioMonitors: string; cameraAngle: string; studioTheme: string; aspectRatio: string; imageSize: string; groundingEnabled: boolean;
+  name: string;
+  role: string;
+  style: string;
+  description: string;
 }
 
 interface CharacterProfile {
-  id: string; userName: string; role: string; bio: string; popularity: number; level: number; earnings: number; appearance: StarAppearance;
-}
-
-interface AccessibilitySettings {
-  voiceGuidance: boolean;
-  closedCaptions: boolean;
-  largeText: boolean;
-  kbShortcuts: boolean;
+  id: string;
+  profile: StarAppearance;
+  level: number;
+  earnings: number;
 }
 
 interface GameState {
   language: string; 
   money: number; 
   roster: CharacterProfile[]; 
-  activeStarId: string | null; 
   currentProducer: string; 
-  tutorialSeen: boolean; 
-  baseEarningAmount: number; 
-  baseEarningIntervalMs: number; 
   theme: 'dark' | 'light';
-  accessibility: AccessibilitySettings;
 }
-
-const DEFAULT_APPEARANCE: StarAppearance = {
-  ageGroup: 'Younger Adults (18-24 years old)', gender: 'Non-Binary', skintone: "Neutral", bodySize: 'Average', hairstyle: 'Spiky Hero Hair', hairColor: 'Neon Pink', eyeColor: 'Cyan', pose: 'Dynamic Hero Pose', top: 'Retro Cartoon Hoodie', bottom: 'Wide-Leg Cartoon Pants', footwear: 'Oversized Red Boots', makeup: 'Star Eye Decal', headwear: 'Backward Star Cap', accessories: 'Cyber-Goggles', primaryColor: 'Magenta', secondaryColor: 'Cyan', studioFurniture: 'Floating Holographic Podium', studioProps: 'Oversized Silver Microphone', studioLighting: 'Vibrant Multi-Color Spots', studioBackdrop: 'City Rooftop Skyline', studioSound: 'High-Tech Lavalier', studioFX: 'Floating Digital Particles', studioAudience: 'Empty Studio', studioFlooring: 'Polished Chrome', studioMonitors: 'CRT TV Wall', cameraAngle: 'Standard Mid-Shot', studioTheme: 'Cyberpunk', aspectRatio: '1:1', imageSize: '1K', groundingEnabled: false
-};
-
-const PLATFORMS = [
-  { name: 'WEB', icon: Globe, color: '#FF0080' },
-  { name: 'ANDROID', icon: Smartphone, color: '#00FF7F' },
-  { name: 'iOS', icon: Smartphone, color: '#00FFFF' },
-  { name: 'HarmonyOS', icon: Cpu, color: '#FFFF00' },
-  { name: 'STEAM', icon: Gamepad2, color: '#0000FF' }
-];
 
 const MyTVStar = () => {
   const [currentView, setCurrentView] = useState<View>(() => {
     const isLoggedIn = localStorage.getItem('myTVStar_isLoggedIn') === 'true';
-    if (!isLoggedIn) return 'home';
-    return 'roster';
+    return isLoggedIn ? 'roster' : 'home';
   });
 
-  const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('myTVStar_isLoggedIn') === 'true');
   const [gameState, setGameState] = useState<GameState>(() => {
     const saved = localStorage.getItem('myTVStar_state');
     if (!saved) return {
-      language: 'en', money: 0, roster: [], activeStarId: null, currentProducer: 'PROD-' + Math.floor(Math.random() * 9000 + 1000), 
-      tutorialSeen: false, baseEarningAmount: 5.00, baseEarningIntervalMs: 10 * 60 * 1000, theme: 'dark',
-      accessibility: { voiceGuidance: false, closedCaptions: true, largeText: false, kbShortcuts: true }
+      language: 'en', money: 0, roster: [], currentProducer: 'ID-' + Math.floor(Math.random() * 9000 + 1000), 
+      theme: 'light'
     };
     return JSON.parse(saved);
   });
 
-  const [selectedTier, setSelectedTier] = useState<{amount: string, label: string, isCustom?: boolean} | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [activeStar, setActiveStar] = useState<CharacterProfile | null>(null);
+  const [selectedTier, setSelectedTier] = useState<any>(null);
   const [customAmountInput, setCustomAmountInput] = useState('');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-
-  const announce = (text: string) => {
-    if (gameState.accessibility.voiceGuidance && window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1.1;
-      window.speechSynthesis.speak(utterance);
-    }
-  };
-
-  const t = (key: string) => TRANSLATIONS[gameState.language]?.[key] || TRANSLATIONS['en'][key] || key;
-  const isDark = gameState.theme === 'dark';
-  const activeStar = useMemo(() => gameState.roster.find(s => s.id === gameState.activeStarId) || null, [gameState.roster, gameState.activeStarId]);
-
   const [showPayoutToast, setShowPayoutToast] = useState(false);
   const [payoutMessage, setPayoutMessage] = useState('');
 
+  // Simulation timer for reward
+  const [sessionTime, setSessionTime] = useState(0);
+
+  useEffect(() => {
+    localStorage.setItem('myTVStar_state', JSON.stringify(gameState));
+  }, [gameState]);
+
+  useEffect(() => {
+    let interval: number;
+    if (currentView === 'studio' && activeStar) {
+      interval = window.setInterval(() => {
+        setSessionTime(prev => {
+          const next = prev + 1;
+          // Every 10 minutes (600 seconds), payout $5
+          if (next % 600 === 0) {
+            setGameState(gs => ({ ...gs, money: gs.money + 5 }));
+            setPayoutMessage("SESSION REWARD COLLECTED: $5.00");
+            setShowPayoutToast(true);
+            setTimeout(() => setShowPayoutToast(false), 3000);
+          }
+          return next;
+        });
+      }, 1000);
+    } else {
+      setSessionTime(0);
+    }
+    return () => clearInterval(interval);
+  }, [currentView, activeStar]);
+
+  const t = (key: string) => TRANSLATIONS[gameState.language]?.[key] || TRANSLATIONS['en'][key] || key;
+  const isDark = gameState.theme === 'dark';
+
   const ThemeStyles = {
-    bg: isDark ? 'bg-[#020617]' : 'bg-[#fcfcfc]',
-    surface: isDark ? 'bg-[#0f172a]' : 'bg-[#ffffff]',
-    cardBorder: isDark ? 'border-white' : 'border-[#000000]',
-    text: isDark ? 'text-white' : 'text-[#000000]',
-    textMuted: isDark ? 'text-white/60' : 'text-[#000000]/60',
-    border: isDark ? 'border-white' : 'border-[#000000]',
-    accentBg: isDark ? 'bg-white' : 'bg-[#000000]',
-    accentBtnText: isDark ? 'text-black' : 'text-white',
-    headerSize: gameState.accessibility.largeText ? 'text-5xl' : 'text-4xl'
+    bg: isDark ? 'bg-black' : 'bg-white',
+    text: isDark ? 'text-white' : 'text-black',
+    border: isDark ? 'border-white' : 'border-black',
+    accent: isDark ? 'bg-white text-black' : 'bg-black text-white',
+    muted: isDark ? 'text-white/40' : 'text-black/40',
+    surface: isDark ? 'bg-zinc-900' : 'bg-zinc-50'
   };
 
-  const Logo = ({ className = "w-12 h-12" }) => (
-    <div className={`flex items-center justify-center bg-white border-4 border-[#FF0080] ${className}`}>
-      <Tv className="w-full h-full text-[#FF0080] p-1" />
-    </div>
-  );
+  const generateTalent = async () => {
+    setIsGenerating(true);
+    try {
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: "Generate a unique TV host or performer profile for a simulation game. Include Name, Role (e.g. News Anchor, Idol, Magician, Chef), Style, and a short Description.",
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              name: { type: Type.STRING },
+              role: { type: Type.STRING },
+              style: { type: Type.STRING },
+              description: { type: Type.STRING }
+            },
+            required: ["name", "role", "style", "description"]
+          }
+        }
+      });
+      
+      const talent = JSON.parse(response.text);
+      const newStar: CharacterProfile = {
+        id: Math.random().toString(36).substr(2, 9),
+        profile: talent,
+        level: 1,
+        earnings: 0
+      };
+
+      setGameState(prev => ({
+        ...prev,
+        roster: [...prev.roster, newStar]
+      }));
+    } catch (error) {
+      console.error("Talent generation failed:", error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const Ticker = () => (
-    <div className={`h-10 bg-[#FF0080] border-b-4 flex items-center overflow-hidden z-[60] relative ${ThemeStyles.border}`} role="status">
+    <div className={`h-12 border-b-2 flex items-center overflow-hidden z-[60] bg-black text-white ${ThemeStyles.border}`} role="status">
       <div className="whitespace-nowrap flex items-center gap-20 animate-marquee">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <span key={i} className="text-white font-black text-[12px] uppercase tracking-[0.2em]">
-            // {t('appTitle')} NETWORK // $5.00 REWARDS ACTIVE // BROADCAST SIMULATION v3.4 // GLOBAL TERMINAL SYNCED //
+        {Array.from({ length: 10 }).map((_, i) => (
+          <span key={i} className="font-mono text-[11px] font-bold uppercase tracking-[0.2em]">
+            // {t('appTitle')} // $5.00 REWARDS ACTIVE // ALL CURRENCIES // CORPORATE FUNDING ENABLED //
           </span>
         ))}
       </div>
     </div>
   );
 
-  const GlobalControls = () => (
-    <div className="flex items-center gap-2 relative z-[110]">
-      <button 
-        aria-label="Toggle Theme"
-        onClick={() => setGameState(p => ({...p, theme: p.theme === 'dark' ? 'light' : 'dark'}))} 
-        className={`p-3 border-4 transition-all ${isDark ? 'bg-[#FF0080] text-white border-white' : 'bg-[#00FF7F] text-black border-black'}`}
-      >
-        {isDark ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-      </button>
-    </div>
+  const Nav = () => (
+    <nav className={`h-20 border-b-2 flex items-center justify-between px-10 sticky top-0 z-[100] ${ThemeStyles.bg} ${ThemeStyles.border}`}>
+      <div className="flex items-center gap-6 cursor-pointer" onClick={() => setCurrentView('home')}>
+        <div className="bg-black border-2 border-white w-10 h-10 flex items-center justify-center">
+          <Tv className="w-6 h-6 text-white" />
+        </div>
+        <span className="font-bebas text-4xl tracking-tighter">{t('appTitle')}</span>
+      </div>
+      <div className="flex items-center gap-8">
+        <button onClick={() => setGameState(p => ({...p, theme: p.theme === 'dark' ? 'light' : 'dark'}))} className="p-2 transition-transform hover:rotate-12">
+          {isDark ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+        </button>
+        <button onClick={() => setCurrentView('donation')} className="font-bebas text-xl uppercase tracking-widest hover:text-[#FF0080]">Support</button>
+        {(gameState.roster.length > 0 || localStorage.getItem('myTVStar_isLoggedIn') === 'true') ? (
+          <button onClick={() => setCurrentView('roster')} className={`px-8 py-2 font-bebas text-2xl border-2 ${ThemeStyles.border} ${ThemeStyles.accent}`}>Hub</button>
+        ) : (
+          <button onClick={() => setCurrentView('login')} className={`px-8 py-2 font-bebas text-2xl border-2 ${ThemeStyles.border} ${ThemeStyles.accent}`}>{t('login')}</button>
+        )}
+      </div>
+    </nav>
   );
 
   if (currentView === 'home') {
     return (
-        <div className={`flex-1 flex flex-col ${ThemeStyles.bg} ${ThemeStyles.text} overflow-y-auto min-h-screen transition-colors relative font-mono`}>
-          <div className="scanline" />
-          <Ticker />
-          
-          <nav className={`h-24 border-b-[6px] flex items-center justify-between px-8 sticky top-0 z-[100] transition-all backdrop-blur-md ${isDark ? 'bg-slate-950/90 border-white' : 'bg-white/95 border-black'}`}>
-            <div className="flex items-center gap-5">
-              <Logo className="w-14 h-14" />
-              <div className="flex flex-col">
-                <span className={`font-bebas text-5xl leading-none tracking-tight ${ThemeStyles.text}`}>{t('appTitle')}</span>
-                <span className="text-[10px] text-[#FF0080] font-black uppercase tracking-[0.2em]">Talent Simulation Hub</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-8">
-              <div className="hidden lg:flex items-center gap-10 font-bebas text-2xl">
-                 <button onClick={() => setCurrentView('donation')} className="hover:text-[#FF0080] transition-colors uppercase tracking-widest decoration-4 hover:underline underline-offset-8">Support</button>
-                 <div className="flex items-center gap-3 bg-black/5 dark:bg-white/10 px-4 py-2 border-2 border-current">
-                    <div className="w-3 h-3 bg-[#00FF7F] animate-pulse rounded-full" />
-                    <span className="text-sm font-black tracking-widest">NETWORK: ACTIVE</span>
-                 </div>
-              </div>
-              <GlobalControls />
-              {isLoggedIn ? (
-                 <button onClick={() => setCurrentView('roster')} className={`btn-flat bg-[#00FF7F] text-black px-12 py-3 font-bebas text-3xl border-4 ${ThemeStyles.border} hover:bg-white hover:scale-105 transition-all`}>
-                    {t('enterHub')}
-                 </button>
-              ) : (
-                 <button onClick={() => setCurrentView('login')} className={`btn-flat bg-[#00FF7F] text-black px-12 py-3 font-bebas text-3xl border-4 ${ThemeStyles.border} hover:bg-white hover:scale-105 transition-all`}>
-                    {t('login')}
-                 </button>
-              )}
-            </div>
-          </nav>
-
-          <main className="flex-1 flex flex-col items-center justify-center py-28 px-10 text-center relative overflow-hidden">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1400px] h-[1400px] bg-[#FF0080]/5 rounded-full blur-[200px] pointer-events-none" />
-            
-            <div className="z-10 flex flex-col items-center max-w-7xl w-full">
-              <div className={`bg-black text-white font-bebas text-3xl px-16 py-4 border-[6px] border-[#00FF7F] mb-10 animate-in slide-in-from-bottom-12 duration-700 uppercase tracking-[0.3em]`}>
-                {t('tagline')}
-              </div>
-              
-              <h2 className={`font-bebas text-[12rem] md:text-[18rem] leading-[0.7] mb-16 animate-in zoom-in-95 duration-1000 tracking-tighter drop-shadow-2xl select-none`}>
-                MY TV <span className="text-[#FFFF00]">STAR</span>
-              </h2>
-
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-stretch justify-center w-full mb-28">
-                 <div className={`border-4 ${ThemeStyles.cardBorder} p-12 ${ThemeStyles.surface} flex flex-col items-center text-center relative group transition-all hover:scale-[1.02] border-t-[12px] border-t-[#00FF7F]`}>
-                    <div className="p-4 bg-black text-[#00FF7F] mb-8 border-4 border-[#00FF7F]">
-                        <DollarSign className="w-14 h-14" />
-                    </div>
-                    <h3 className="font-bebas text-5xl mb-4">{t('rewardTitle')}</h3>
-                    <p className="text-sm uppercase opacity-80 leading-relaxed font-black tracking-widest max-w-xs">{t('rewardDesc')}</p>
-                 </div>
-
-                 <div className="flex flex-col gap-12 items-center justify-center bg-black/5 dark:bg-white/5 p-12 border-4 border-dashed border-current">
-                    <button 
-                      onClick={() => isLoggedIn ? setCurrentView('roster') : setCurrentView('login')} 
-                      className="btn-flat bg-[#FFFF00] text-[#000000] px-24 py-14 text-8xl border-[16px] border-black font-bebas hover:bg-[#FF0080] hover:text-white transition-all transform hover:-translate-y-4 hover:scale-105 group active:translate-y-2"
-                    >
-                        {isLoggedIn ? t('enterHub') : t('startSim')}
-                    </button>
-                    <div className="text-[14px] font-black uppercase tracking-[0.5em] opacity-80 flex items-center gap-5">
-                       <Signal className="w-8 h-8 text-[#FF0080] animate-pulse" />
-                       TERMINAL STATUS: READY
-                    </div>
-                 </div>
-
-                 <div className={`border-4 ${ThemeStyles.cardBorder} p-12 ${ThemeStyles.surface} flex flex-col items-center text-center relative group transition-all hover:scale-[1.02] border-t-[12px] border-t-[#FF0080]`}>
-                    <div className="p-4 bg-black text-[#FF0080] mb-8 border-4 border-[#FF0080]">
-                        <Cpu className="w-14 h-14" />
-                    </div>
-                    <h3 className="font-bebas text-5xl mb-4">SYNTHESIS CORE</h3>
-                    <p className="text-sm uppercase opacity-80 leading-relaxed font-black tracking-widest max-w-xs">Global talent simulation powered by native Gemini 3 AI architectures.</p>
-                 </div>
-              </div>
-
-              <div className={`w-full py-14 border-y-[8px] ${ThemeStyles.border} overflow-hidden bg-slate-200/50 dark:bg-slate-900/80`}>
-                 <div className="whitespace-nowrap flex items-center gap-40 animate-marquee opacity-60 hover:opacity-100 transition-opacity">
-                    {[...PLATFORMS, ...PLATFORMS].map((p, i) => (
-                      <div key={i} className="flex items-center gap-8 grayscale hover:grayscale-0 transition-all">
-                         <p.icon className="w-12 h-12" />
-                         <span className="font-bebas text-5xl tracking-[0.3em]">{p.name}</span>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-            </div>
-          </main>
-
-          <section className={`py-40 px-12 bg-black text-white relative`}>
-             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-32 items-start">
-                <div className="space-y-16">
-                   <div className="inline-block px-8 py-3 bg-[#00FF7F] text-black text-sm font-black uppercase tracking-[0.4em] border-4 border-white">Network Transparency</div>
-                   <h3 className="font-bebas text-[10rem] md:text-[12rem] leading-[0.75] uppercase tracking-tighter">POWER THE <br/><span className="text-[#00FF7F]">EMPIRE</span></h3>
-                   <div className="space-y-6">
-                       <p className="text-lg opacity-80 leading-relaxed uppercase tracking-widest max-w-xl font-bold">
-                          My TV Star is a decentralized community broadcast network. Every contribution scales our global synthesis nodes.
-                       </p>
-                       <div className="flex items-center gap-4 text-[#FFFF00] font-black text-xs uppercase tracking-widest">
-                          <Info className="w-6 h-6" />
-                          <span>Player payouts are guaranteed at $5.00 every 10 min session.</span>
-                       </div>
-                   </div>
-                   <div className="flex flex-wrap gap-8 pt-10">
-                      <button onClick={() => setCurrentView('donation')} className="btn-flat bg-[#FF0080] text-white px-16 py-8 font-bebas text-4xl border-[6px] border-white hover:bg-white hover:text-black transition-all">
-                        SEND DONATION
-                      </button>
-                      <button className="btn-flat bg-white text-black px-16 py-8 font-bebas text-4xl border-[6px] border-[#00FF7F] hover:bg-[#00FF7F] transition-all">
-                        STATS LOG
-                      </button>
-                   </div>
-                </div>
-
-                <div className="flex flex-col border-[10px] border-white/30 bg-white/5 backdrop-blur-xl overflow-hidden w-full transition-all hover:border-white">
-                    <div className="flex items-center p-10 border-b-[8px] border-white/20 bg-white/10 font-black text-[12px] uppercase tracking-[0.5em] text-[#00FF7F]">
-                        <div className="w-16 shrink-0 flex justify-center"><Hash className="w-6 h-6" /></div>
-                        <div className="flex-1 px-6">PROTOCOL DISTRIBUTION PATH</div>
-                        <div className="w-32 text-right">LOAD %</div>
-                    </div>
-                    
-                    {[
-                      { label: 'PLAYER REVENUES', val: '40', icon: DollarSign, color: 'text-[#00FF7F]', barColor: 'bg-[#00FF7F]', width: 'w-[40%]' },
-                      { label: 'NODE INFRASTRUCTURE', val: '20', icon: Activity, color: 'text-[#FFFF00]', barColor: 'bg-[#FFFF00]', width: 'w-[20%]' },
-                      { label: 'AI CORE SYNTHESIS', val: '20', icon: Cpu, color: 'text-[#00FFFF]', barColor: 'bg-[#00FFFF]', width: 'w-[20%]' },
-                      { label: 'PLATFORM GOVERNANCE', val: '20', icon: Heart, color: 'text-[#FF0080]', barColor: 'bg-[#FF0080]', width: 'w-[20%]' }
-                    ].map((item, idx) => (
-                      <div key={item.label} className={`flex items-center p-10 transition-all hover:bg-white/15 ${idx !== 3 ? 'border-b-4 border-white/10' : ''} group`}>
-                          <div className="w-16 shrink-0 flex flex-col items-center justify-center opacity-40 group-hover:opacity-100 transition-all duration-300">
-                              <span className="text-[12px] mb-2 font-black text-white/50">#0{idx+1}</span>
-                              <item.icon className={`w-8 h-8 ${item.color} group-hover:scale-125 transition-transform`} />
-                          </div>
-                          
-                          <div className="flex-1 px-10 space-y-6">
-                              <div className="flex items-baseline justify-between">
-                                  <span className="font-bebas text-5xl tracking-widest group-hover:text-[#FFFF00] transition-colors uppercase">{item.label}</span>
-                                  <span className={`font-bebas text-6xl leading-none ${item.color} hidden sm:block`}>{item.val}%</span>
-                              </div>
-                              <div className="h-4 w-full bg-white/10 border-2 border-white/20 relative overflow-hidden">
-                                  <div className={`absolute top-0 left-0 h-full ${item.barColor} ${item.width} transition-all duration-1000 ease-in-out group-hover:brightness-125 shadow-[0_0_20px_rgba(255,255,255,0.2)]`} />
-                              </div>
-                          </div>
-
-                          <div className="w-32 text-right sm:hidden">
-                              <span className={`font-bebas text-6xl leading-none ${item.color}`}>{item.val}%</span>
-                          </div>
-                      </div>
-                    ))}
-                    
-                    <div className="p-12 bg-[#00FF7F] text-black flex justify-between items-center group cursor-default">
-                        <div className="flex items-center gap-8">
-                            <div className="p-6 bg-black text-[#00FF7F] border-4 border-white transform hover:rotate-6 transition-transform">
-                                <BarChart4 className="w-12 h-12" />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-[12px] font-black uppercase tracking-[0.3em] leading-none mb-2 opacity-80">AGGREGATE SYNC</span>
-                                <span className="font-bebas text-5xl leading-none tracking-tight">TOTAL LOAD</span>
-                            </div>
-                        </div>
-                        <div className="flex flex-col items-end">
-                            <span className="font-bebas text-[6rem] leading-none tracking-tighter">100.00%</span>
-                            <span className="text-[11px] font-black uppercase opacity-100 tracking-[0.5em] mt-2 flex items-center gap-2">
-                                <CheckCircle2 className="w-4 h-4" /> STATUS: OPERATIONAL
-                            </span>
-                        </div>
-                    </div>
-                </div>
-             </div>
-          </section>
-
-          <footer className={`py-40 flex flex-col items-center justify-center gap-14 bg-black border-t-[12px] border-white`}>
-              <div className="flex items-center gap-20 opacity-20 hover:opacity-100 transition-opacity duration-1000">
-                 <Logo className="w-20 h-20 grayscale" />
-                 <span className="font-bebas text-8xl text-white tracking-[0.6em]">MY TV STAR</span>
-              </div>
-              <div className="flex flex-col gap-5 items-center px-12">
-                <div className="text-[13px] text-white/50 uppercase tracking-[1em] text-center max-w-4xl leading-loose font-black">
-                   ENCRYPTED BROADCAST PROTOCOL // GLOBAL TALENT SYNTHESIS // UNIVERSAL NODE SYNC
-                </div>
-                <div className="h-1 w-60 bg-[#FF0080] my-8" />
-                <div className="text-[12px] text-[#00FF7F] font-black uppercase tracking-[0.4em] flex flex-wrap justify-center items-center gap-6">
-                   <div className="flex items-center gap-2"><ShieldCheck className="w-5 h-5" /> SECURE DONATIONS</div>
-                   <div className="flex items-center gap-2"><Globe className="w-5 h-5" /> GLOBAL NETWORK</div>
-                   <div className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5" /> VERIFIED PAYOUTS</div>
-                </div>
-              </div>
-          </footer>
-        </div>
-    );
-  }
-
-  if (currentView === 'donation') {
-    const fixedTiers = [
-      { amount: "1 USD", label: "MICRO DONATION", icon: Zap },
-      { amount: "2 USD", label: "BASIC SUPPORT", icon: Coins },
-      { amount: "5 USD", label: "NETWORK FUEL", icon: Activity },
-      { amount: "10 USD", label: "BOOSTER", icon: Signal },
-      { amount: "20 USD", label: "PRO SUPPORTER", icon: Shield },
-      { amount: "50 USD", label: "STUDIO PARTNER", icon: Trophy },
-      { amount: "100 USD", label: "EXECUTIVE PRODUCER", icon: Star }
-    ];
-
-    return (
-      <div className={`flex-1 flex flex-col ${ThemeStyles.bg} ${ThemeStyles.text} h-screen transition-colors overflow-y-auto custom-scrollbar font-mono`}>
-         <Ticker />
-         <header className={`h-24 border-b-8 flex items-center justify-between px-8 sticky top-0 z-[100] transition-colors ${isDark ? 'border-white bg-[#020617]' : 'border-black bg-white'}`}>
-            <div className="flex items-center gap-8"><Logo className="w-14 h-14" /><h1 className={`font-bebas uppercase text-6xl tracking-tight`}>{t('donationPageTitle')}</h1></div>
-            <div className="flex items-center gap-6">
-              <GlobalControls />
-              <button onClick={() => setCurrentView('home')} className={`btn-flat ${ThemeStyles.accentBg} ${ThemeStyles.accentBtnText} px-10 py-3 font-bebas text-2xl border-4 ${ThemeStyles.border}`}>BACK</button>
-            </div>
-         </header>
-
-         <main className="max-w-7xl mx-auto w-full p-10 md:p-20 space-y-24">
-            <section className="text-center space-y-10">
-               <div className="inline-block bg-[#FF0080] text-white font-bebas text-3xl px-12 py-3 border-4 border-black mb-6">{t('supportTagline')}</div>
-               <h2 className={`font-bebas text-9xl md:text-[12rem] leading-none tracking-tighter`}>COMMUNITY <span className="text-[#00FF7F]">TREASURY</span></h2>
-               <p className="text-lg uppercase opacity-80 max-w-3xl mx-auto font-black tracking-widest leading-relaxed">
-                  CONTRIBUTE TO SCALE THE NETWORK. WE SUPPORT ALL CURRENCIES VIA AUTOMATIC AUTO-CONVERSION.
-               </p>
-            </section>
-
-            <section className="grid grid-cols-2 md:grid-cols-4 gap-8">
-               {fixedTiers.map((tier, idx) => (
-                 <button 
-                  key={idx}
-                  onClick={() => {
-                    setSelectedTier(tier);
-                    announce(`Initiating ${tier.amount} donation.`);
-                  }}
-                  className={`flex flex-col items-center justify-center p-12 border-4 ${ThemeStyles.border} transition-all hover:bg-[#00FF7F] hover:text-black hover:scale-105 active:scale-95 group bg-inherit`}
-                 >
-                    <tier.icon className="w-16 h-16 mb-6 group-hover:rotate-12 transition-transform" />
-                    <span className="font-bebas text-6xl leading-none">{tier.amount}</span>
-                    <span className="text-[11px] font-black uppercase tracking-widest mt-4 opacity-70 group-hover:opacity-100">{tier.label}</span>
-                 </button>
-               ))}
-               <button 
+      <div className={`min-h-screen ${ThemeStyles.bg} ${ThemeStyles.text} flex flex-col font-mono`}>
+        <Ticker />
+        <Nav />
+        <main className="flex-1 flex flex-col items-center justify-center py-20 px-10">
+          <div className="text-center max-w-6xl w-full">
+            <span className="font-mono text-xs font-bold tracking-[0.5em] opacity-40 mb-6 block uppercase">{t('tagline')}</span>
+            <h1 className="font-bebas text-[14rem] leading-[0.8] tracking-tighter mb-16 select-none animate-in zoom-in-95 duration-500">
+              MY TV <span className="text-[#FF0080]">STAR</span>
+            </h1>
+            <div className="flex flex-col items-center gap-12 mb-24">
+              <button 
                 onClick={() => {
-                  setSelectedTier({amount: '', label: 'CUSTOM', isCustom: true});
-                  announce("Entering custom amount mode.");
+                  localStorage.setItem('myTVStar_isLoggedIn', 'true');
+                  setCurrentView('roster');
                 }}
-                className={`flex flex-col items-center justify-center p-12 border-4 ${ThemeStyles.border} transition-all hover:bg-[#FF0080] hover:text-white hover:scale-105 active:scale-95 group bg-inherit`}
-               >
-                  <MousePointer2 className="w-16 h-16 mb-6 group-hover:rotate-12 transition-transform" />
-                  <span className="font-bebas text-6xl leading-none">CUSTOM</span>
-                  <span className="text-[11px] font-black uppercase tracking-widest mt-4 opacity-70 group-hover:opacity-100">ANY AMOUNT</span>
-               </button>
-            </section>
-
-            {/* Corporate Section */}
-            <section className={`p-14 border-[12px] border-dashed ${ThemeStyles.border} ${ThemeStyles.surface} flex flex-col md:flex-row items-center gap-12 relative overflow-hidden`}>
-                <div className="bg-black text-white p-8 border-4 border-[#00FF7F] shrink-0">
-                    <Briefcase className="w-20 h-20" />
-                </div>
-                <div className="space-y-4">
-                    <h3 className="font-bebas text-5xl text-[#00FF7F] leading-none uppercase">{t('corporateTitle')}</h3>
-                    <p className="text-lg uppercase font-black opacity-80 tracking-widest leading-relaxed">
-                        {t('corporateDesc')}
-                    </p>
-                    <div className="flex items-center gap-4 text-[10px] font-black opacity-60 uppercase tracking-widest">
-                        <CheckCircle2 className="w-4 h-4" /> Official Invoicing Available
-                        <CheckCircle2 className="w-4 h-4" /> Priority Global Support
-                        <CheckCircle2 className="w-4 h-4" /> Network Partner Status
-                    </div>
-                </div>
-            </section>
-
-            <section className={`p-14 border-[12px] ${ThemeStyles.border} ${ThemeStyles.surface} grid grid-cols-1 lg:grid-cols-2 gap-20 relative overflow-hidden`}>
-                <div className="space-y-12 relative z-10">
-                    <div className="flex items-center gap-8 border-b-8 border-current pb-10">
-                        <QrCode className="w-16 h-16 text-[#FF0080]" />
-                        <h2 className="font-bebas text-7xl tracking-tight leading-none uppercase">{t('paymentTerminal')}</h2>
-                    </div>
-                    <div className="flex items-start gap-6 p-8 border-8 border-black bg-[#FFFF00] text-black text-[13px] font-black uppercase tracking-[0.2em] leading-loose">
-                        <ShieldCheck className="w-12 h-12 shrink-0" />
-                        <div>
-                            {t('universalSupport')}<br/>
-                            AUTO-CONVERSION FOR ALL LOCAL CURRENCIES ENABLED.
-                        </div>
-                    </div>
-                    
-                    <div className="flex flex-col gap-12">
-                        <div className="flex flex-col gap-6">
-                            <div className="flex flex-col gap-2">
-                                <span className="text-[11px] font-black opacity-60 uppercase tracking-[0.3em] border-l-4 border-[#FF0080] pl-3">PAYPAL ACCOUNT</span>
-                                <div className="flex items-center gap-5">
-                                    <div className="p-4 bg-blue-600 border-4 border-black text-white"><CreditCard className="w-10 h-10" /></div>
-                                    <span className="font-bebas text-3xl tracking-wide text-blue-600 font-bold underline">dhea_wasisto@yahoo.com</span>
-                                </div>
-                            </div>
-                            
-                            <div className="flex flex-col gap-2">
-                                <span className="text-[11px] font-black opacity-60 uppercase tracking-[0.3em] border-l-4 border-[#00FFFF] pl-3">BANK JAGO (DIRECT)</span>
-                                <div className="flex items-center gap-5">
-                                    <div className="p-4 bg-orange-500 border-4 border-black text-white"><Building2 className="w-10 h-10" /></div>
-                                    <span className="font-bebas text-5xl tracking-[0.1em] text-orange-600 bg-white border-2 border-orange-600 px-4 py-1">107863277869</span>
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col gap-2">
-                                <span className="text-[11px] font-black opacity-60 uppercase tracking-[0.3em] border-l-4 border-[#00FF7F] pl-3">E-WALLETS RECIPIENT</span>
-                                <div className="flex items-center gap-5">
-                                    <div className="p-4 bg-[#00FF7F] border-4 border-black text-black"><SmartphoneNfc className="w-10 h-10" /></div>
-                                    <span className="font-bebas text-4xl tracking-wide text-[#00FF7F] bg-black px-4 py-1">+628567239000</span>
-                                </div>
-                                <span className="text-[11px] font-black opacity-80 tracking-widest mt-2">SUPPORTS: GOPAY / OVO / SHOPEEPAY / DANA</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="flex flex-col items-center justify-center p-20 bg-black border-[12px] border-white relative group">
-                    <div className="absolute top-0 left-0 w-full h-full opacity-20 bg-[radial-gradient(circle_at_center,_var(--green)_0%,_transparent_70%)] animate-pulse pointer-events-none" />
-                    <div className="bg-white p-10 border-[6px] border-[#00FF7F] relative transition-transform duration-500 group-hover:scale-110">
-                        <div className="w-72 h-72 flex items-center justify-center relative">
-                            <div className="grid grid-cols-12 grid-rows-12 gap-0.5 w-full h-full p-2">
-                                {Array.from({length: 144}).map((_, i) => (
-                                    <div key={i} className={`bg-black ${Math.random() > 0.4 ? 'opacity-100' : 'opacity-10'}`} />
-                                ))}
-                            </div>
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <Logo className="w-24 h-24 border-4 border-black bg-white" />
-                            </div>
-                        </div>
-                    </div>
-                    <span className="text-[#00FF7F] font-bebas text-4xl mt-14 animate-pulse tracking-[0.3em]">{t('scanQr')}</span>
-                    <span className="text-white/50 text-[11px] font-black uppercase mt-5 tracking-[0.5em]">UNIVERSAL QR GATEWAY // ALL APPS SYNCED</span>
-                </div>
-            </section>
-         </main>
-
-         <footer className="h-48 flex items-center justify-center border-t-[12px] border-black bg-[#FFFF00] mt-24">
-            <button onClick={() => setCurrentView('home')} className="btn-flat bg-black text-white px-24 py-10 text-6xl font-bebas border-[10px] border-white hover:scale-110 transition-transform active:scale-95">
-               RETURN TO HUB
-            </button>
-         </footer>
+                className={`px-20 py-8 text-7xl font-bebas border-4 ${ThemeStyles.border} ${ThemeStyles.accent} hover:scale-105 transition-all`}
+              >
+                {t('startSim')}
+              </button>
+              <div className="flex items-center gap-4 text-xs font-bold opacity-40 tracking-widest uppercase">
+                <Signal className="w-5 h-5 animate-pulse text-[#00FF7F]" /> SYSTEM OPERATIONAL // NODE ACTIVE
+              </div>
+            </div>
+          </div>
+        </main>
       </div>
     );
   }
 
-  if (currentView === 'login') {
+  if (currentView === 'donation') {
+    const tiers = [
+      { amount: "1 USD", icon: Zap },
+      { amount: "2 USD", icon: Coins },
+      { amount: "5 USD", icon: Activity },
+      { amount: "10 USD", icon: Signal },
+      { amount: "20 USD", icon: ShieldCheck },
+      { amount: "50 USD", icon: Trophy },
+      { amount: "100 USD", icon: Star }
+    ];
+
     return (
-      <div className={`flex-1 flex flex-col ${ThemeStyles.bg} h-screen transition-colors font-mono`}>
-        <nav className={`h-24 border-b-8 flex items-center justify-between px-8 transition-all ${isDark ? 'bg-slate-950 border-white' : 'bg-white border-black'}`}>
-           <div className="flex items-center gap-6">
-             <Logo className="w-14 h-14" />
-             <span className={`font-bebas text-5xl leading-none tracking-tight ${ThemeStyles.text}`}>{t('appTitle')}</span>
-           </div>
-           <GlobalControls />
-        </nav>
-        <div className="flex-1 flex flex-col items-center justify-center p-12 relative">
-           <div className={`${ThemeStyles.surface} border-[16px] ${ThemeStyles.border} p-20 max-w-2xl w-full space-y-14 z-10 animate-in fade-in zoom-in-95`}>
-              <div className="flex justify-between items-start border-b-[6px] border-current pb-10">
-                <h2 className={`text-8xl font-bebas uppercase leading-none tracking-tight ${ThemeStyles.text}`}>{t('identitySync')}</h2>
-                <div className="bg-[#00FF7F] px-5 py-2 font-black text-[13px] border-4 border-black text-black">ENCRYPTED</div>
-              </div>
-              <div className="space-y-4">
-                 <span className="font-black text-[13px] uppercase tracking-[0.4em] opacity-60">PRODUCER_NODE_ID</span>
-                 <input 
-                   aria-label="Producer ID input"
-                   value={gameState.currentProducer} 
-                   onChange={(e) => setGameState(p => ({...p, currentProducer: e.target.value}))} 
-                   className={`w-full border-[6px] ${ThemeStyles.border} p-10 text-5xl font-black text-center outline-none focus:border-[#FF0080] transition-all bg-slate-100 dark:bg-slate-800 text-current tracking-[0.2em] uppercase`} 
-                   placeholder="ID_NULL" 
-                 />
-              </div>
-              <button 
-                onClick={() => { setIsLoggedIn(true); localStorage.setItem('myTVStar_isLoggedIn', 'true'); setCurrentView('roster'); announce("Sync complete. System online."); }} 
-                className={`w-full btn-flat py-14 ${ThemeStyles.accentBg} ${ThemeStyles.accentBtnText} text-6xl font-bebas border-[10px] ${ThemeStyles.border} hover:bg-[#FF0080] hover:text-white transition-all transform hover:-translate-y-2`}
-              >
-                {t('enterTerminal')}
+      <div className={`min-h-screen ${ThemeStyles.bg} ${ThemeStyles.text} flex flex-col font-mono`}>
+        <Ticker />
+        <Nav />
+        <main className="max-w-6xl mx-auto w-full p-10 pt-20">
+          <section className="mb-24 text-center">
+            <h1 className="font-bebas text-9xl tracking-tighter mb-4 leading-none uppercase">Network Support</h1>
+            <p className="text-xs font-bold tracking-widest uppercase opacity-40 max-w-2xl mx-auto">{t('supportDesc')}</p>
+          </section>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-20">
+            {tiers.map((tier, idx) => (
+              <button key={idx} onClick={() => setSelectedTier(tier)} className={`p-10 border-4 ${ThemeStyles.border} flex flex-col items-center gap-4 hover:bg-black hover:text-white transition-all`}>
+                <tier.icon className="w-10 h-10" />
+                <span className="font-bebas text-5xl">{tier.amount}</span>
               </button>
-              <div className={`text-center text-[12px] font-black opacity-50 uppercase tracking-[0.5em] ${ThemeStyles.text}`}>Universal Session Key v3.4.0-Stable</div>
-           </div>
-        </div>
+            ))}
+            <button onClick={() => setSelectedTier({isCustom: true, amount: ''})} className={`p-10 border-4 ${ThemeStyles.border} flex flex-col items-center gap-4 hover:bg-[#FF0080] hover:text-white transition-all`}>
+              <MousePointer2 className="w-10 h-10" />
+              <span className="font-bebas text-5xl">Custom</span>
+            </button>
+          </div>
+
+          <div className={`border-4 ${ThemeStyles.border} p-12 grid grid-cols-1 lg:grid-cols-2 gap-16 items-start mb-20`}>
+            <div className="space-y-12">
+              <div className="flex items-center gap-4">
+                 <QrCode className="w-12 h-12 text-[#FF0080]" />
+                 <h2 className="font-bebas text-6xl tracking-tight leading-none">{t('paymentTerminal')}</h2>
+              </div>
+              
+              <div className="space-y-10">
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold opacity-40 uppercase tracking-widest block border-l-2 border-[#00FF7F] pl-4 mb-4">Bank Jago Direct (Global)</span>
+                  <div className="flex items-center gap-6">
+                    <Building2 className="w-10 h-10 text-orange-500" />
+                    <span className="font-bebas text-5xl tracking-widest bg-zinc-100 dark:bg-zinc-800 px-4 py-1">107863277869</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold opacity-40 uppercase tracking-widest block border-l-2 border-blue-500 pl-4 mb-4">PayPal (Instant Sync)</span>
+                  <a href="https://paypal.me/anindijewidhie" target="_blank" rel="noopener noreferrer" className="flex items-center gap-6 hover:opacity-80 transition-opacity group">
+                    <CreditCard className="w-10 h-10 text-blue-600" />
+                    <span className="font-bebas text-4xl text-blue-600 underline decoration-2 underline-offset-4">paypal.me/anindijewidhie</span>
+                    <ExternalLink className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </a>
+                </div>
+
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold opacity-40 uppercase tracking-widest block border-l-2 border-magenta pl-4 mb-4">E-Wallet (GoPay / OVO / DANA)</span>
+                  <div className="flex items-center gap-6">
+                    <SmartphoneNfc className="w-10 h-10 text-[#00FF7F]" />
+                    <span className="font-bebas text-5xl tracking-widest">+628567239000</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-black text-white p-12 flex flex-col items-center justify-center border-4 border-white gap-10">
+              <div className="bg-white p-8 border-4 border-[#00FF7F]">
+                <QrCode className="w-56 h-56 text-black" />
+              </div>
+              <div className="text-center">
+                <span className="font-bebas text-4xl tracking-widest animate-pulse block mb-2">{t('scanQr')}</span>
+                <span className="text-[10px] font-bold tracking-[0.4em] opacity-40 uppercase">Supports Banks, Organizations & Companies</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Corporate section with more emphasis */}
+          <div className={`p-16 border-4 border-dashed ${ThemeStyles.border} bg-zinc-50 dark:bg-zinc-900/50 flex flex-col md:flex-row items-center gap-12 group`}>
+            <div className="bg-black text-white p-8 border-4 border-white group-hover:bg-[#FF0080] transition-colors">
+              <Briefcase className="w-20 h-20" />
+            </div>
+            <div className="space-y-4">
+              <h3 className="font-bebas text-6xl leading-none">{t('corporateTitle')}</h3>
+              <p className="text-sm font-bold opacity-60 uppercase leading-loose max-w-xl">{t('corporateDesc')}</p>
+              <div className="flex items-center gap-6 text-[10px] font-bold opacity-40 uppercase tracking-widest pt-4">
+                 <CheckCircle2 className="w-5 h-5 text-[#00FF7F]" /> Institutional Grants
+                 <CheckCircle2 className="w-5 h-5 text-[#00FF7F]" /> Large Enterprise Support
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <footer className="h-40 flex items-center justify-center border-t-4 border-black bg-[#FFFF00] mt-20">
+          <button onClick={() => setCurrentView('home')} className="bg-black text-white px-20 py-8 text-5xl font-bebas border-4 border-white hover:scale-105 transition-all">
+            Return to Hub
+          </button>
+        </footer>
+
+        {selectedTier && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 p-6 backdrop-blur-sm">
+            <div className={`${ThemeStyles.bg} border-4 ${ThemeStyles.border} p-16 max-w-3xl w-full flex flex-col gap-12 animate-in zoom-in-95 duration-200`}>
+              <div className="flex justify-between items-start border-b-4 border-current pb-8">
+                <div>
+                  <h2 className="font-bebas text-7xl tracking-tighter uppercase mb-2">Sync Payment</h2>
+                  <span className="font-bebas text-4xl text-[#FF0080] uppercase tracking-widest">
+                    {selectedTier.isCustom ? 'Custom Grant' : selectedTier.amount}
+                  </span>
+                </div>
+                <button onClick={() => setSelectedTier(null)} className="p-4 hover:bg-red-500 hover:text-white transition-colors">
+                  <X className="w-10 h-10" />
+                </button>
+              </div>
+
+              {selectedTier.isCustom && (
+                <div className="space-y-4">
+                  <span className="text-[10px] font-bold opacity-40 uppercase tracking-widest">Manual Amount Entry (USD)</span>
+                  <input 
+                    autoFocus
+                    type="number" 
+                    value={customAmountInput}
+                    onChange={(e) => setCustomAmountInput(e.target.value)}
+                    className={`w-full p-8 border-4 ${ThemeStyles.border} text-6xl font-bebas bg-zinc-100 dark:bg-zinc-800 outline-none focus:border-[#00FF7F] tracking-tighter`}
+                    placeholder="0.00"
+                  />
+                </div>
+              )}
+
+              <div className="p-10 bg-zinc-100 dark:bg-zinc-900 border-4 border-current space-y-4">
+                <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
+                  <span>Network ID</span>
+                  <span className="opacity-40">{gameState.currentProducer}</span>
+                </div>
+                <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
+                  <span>Merchant</span>
+                  <span>MY TV STAR FOUNDATION</span>
+                </div>
+              </div>
+
+              <button 
+                disabled={isProcessingPayment || (selectedTier.isCustom && (!customAmountInput || parseFloat(customAmountInput) <= 0))}
+                onClick={() => {
+                  setIsProcessingPayment(true);
+                  setTimeout(() => {
+                    setPayoutMessage(`LOGGED CONTRIBUTION: ${selectedTier.isCustom ? customAmountInput : selectedTier.amount}`);
+                    setShowPayoutToast(true);
+                    setSelectedTier(null);
+                    setIsProcessingPayment(false);
+                    setTimeout(() => setShowPayoutToast(false), 5000);
+                  }, 2500);
+                }}
+                className={`w-full py-10 font-bebas text-6xl border-4 ${ThemeStyles.border} ${ThemeStyles.accent} hover:bg-[#00FF7F] hover:text-black transition-all disabled:opacity-50`}
+              >
+                {isProcessingPayment ? 'Processing Node Sync...' : 'Finalize Transfer'}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
 
   if (currentView === 'roster') {
     return (
-      <div className={`flex-1 flex flex-col ${ThemeStyles.bg} ${ThemeStyles.text} h-screen transition-colors font-mono`}>
+      <div className={`min-h-screen ${ThemeStyles.bg} ${ThemeStyles.text} flex flex-col font-mono`}>
         <Ticker />
-        <header className={`h-28 border-b-8 flex items-center justify-between px-10 sticky top-0 z-[100] transition-colors ${isDark ? 'border-white bg-[#020617]' : 'border-black bg-white'}`}>
+        <Nav />
+        <main className="flex-1 p-16 max-w-7xl mx-auto w-full">
+          <div className="flex justify-between items-end mb-16 border-b-8 border-current pb-8">
+            <h1 className="font-bebas text-[10rem] tracking-tighter leading-none">{t('talentHub')}</h1>
+            <div className="flex items-center gap-10">
+               <div className="text-right">
+                  <span className="text-xs font-bold opacity-40 block uppercase tracking-widest mb-2">Network Treasury</span>
+                  <span className="font-bebas text-7xl text-[#00FF7F]">${gameState.money.toFixed(2)}</span>
+               </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
+            <button 
+              onClick={generateTalent}
+              disabled={isGenerating}
+              className={`border-4 border-dashed ${ThemeStyles.border} h-[600px] flex flex-col items-center justify-center gap-10 group hover:bg-[#FF0080]/5 hover:border-[#FF0080] transition-all disabled:opacity-50`}
+            >
+              {isGenerating ? <Loader2 className="w-24 h-24 animate-spin" /> : <PlusCircle className="w-24 h-24 group-hover:scale-110 transition-transform" />}
+              <span className="font-bebas text-6xl tracking-tight uppercase">{isGenerating ? 'Drafting...' : t('signTalent')}</span>
+            </button>
+            
+            {gameState.roster.map(star => (
+               <div key={star.id} className={`border-4 ${ThemeStyles.border} h-[600px] flex flex-col overflow-hidden group hover:scale-[1.02] transition-transform`}>
+                  <div className="flex-1 bg-black flex flex-col items-center justify-center p-12 text-center gap-8">
+                    <div className="relative">
+                      <Bot className="w-32 h-32 text-white opacity-10 group-hover:opacity-100 group-hover:text-[#FF0080] transition-all duration-500" />
+                      <div className="absolute -top-4 -right-4 bg-[#00FF7F] text-black px-3 py-1 font-bebas text-2xl border-2 border-black">LIVE</div>
+                    </div>
+                    <div>
+                       <h3 className="font-bebas text-6xl text-white leading-none mb-3 uppercase tracking-tight">{star.profile.name}</h3>
+                       <div className="inline-block border-2 border-[#00FF7F] px-4 py-1 text-xs font-bold text-[#00FF7F] tracking-widest uppercase">{star.profile.role}</div>
+                    </div>
+                    <p className="text-xs text-white/40 uppercase leading-relaxed font-bold tracking-widest">{star.profile.description}</p>
+                  </div>
+                  <div className="p-10 border-t-4 border-current flex justify-between items-center bg-zinc-100 dark:bg-zinc-900">
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold opacity-40 tracking-widest uppercase">Contract Level {star.level}</span>
+                      <div className="font-bebas text-5xl tracking-tight">${star.earnings.toFixed(2)}</div>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        setActiveStar(star);
+                        setCurrentView('studio');
+                      }}
+                      className="p-8 border-4 border-black bg-black text-white hover:bg-[#FF0080] transition-all group-hover:rotate-6"
+                    >
+                      <Play className="w-10 h-10 fill-current" />
+                    </button>
+                  </div>
+               </div>
+            ))}
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (currentView === 'studio' && activeStar) {
+    const progress = (sessionTime % 600) / 600 * 100;
+    const remainingSeconds = 600 - (sessionTime % 600);
+    const minutes = Math.floor(remainingSeconds / 60);
+    const seconds = remainingSeconds % 60;
+
+    return (
+      <div className={`min-h-screen bg-black text-white flex flex-col font-mono selection:bg-[#FF0080]`}>
+        <div className="h-2 bg-[#FF0080] w-full" />
+        <header className="h-24 border-b-2 border-white/20 flex items-center justify-between px-10">
           <div className="flex items-center gap-8">
-            <Logo className="w-16 h-16" />
-            <h1 className={`font-bebas uppercase text-7xl tracking-tight leading-none ${ThemeStyles.text}`}>{t('talentHub')}</h1>
+            <div className="flex items-center gap-3">
+              <div className="w-4 h-4 bg-red-600 rounded-full animate-pulse" />
+              <span className="font-bebas text-3xl tracking-widest">ON AIR</span>
+            </div>
+            <div className="h-8 w-px bg-white/20" />
+            <span className="font-bold text-xs tracking-widest opacity-40">STUDIO_7 NODE_SYNC_{gameState.currentProducer}</span>
           </div>
-          <div className="flex items-center gap-6">
-            <button onClick={() => setCurrentView('donation')} className={`btn-flat bg-[#00FF7F] text-black px-10 py-3 font-bebas text-3xl border-4 border-black hover:bg-white`}>SUPPORT</button>
-            <GlobalControls />
-            <button onClick={() => setCurrentView('home')} className={`btn-flat ${ThemeStyles.accentBg} ${ThemeStyles.accentBtnText} px-10 py-3 font-bebas text-3xl border-4 ${ThemeStyles.border}`}>HOME</button>
-          </div>
-        </header>
-        <main className="flex-1 p-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-16 overflow-y-auto relative custom-scrollbar">
           <button 
-            onClick={() => { announce("Preparing talent contract."); }} 
-            className={`border-[10px] border-dashed ${isDark ? 'border-slate-700 text-slate-700' : 'border-slate-300 text-slate-400'} flex flex-col items-center justify-center p-14 hover:bg-[#FF0080]/10 hover:border-[#FF0080] hover:text-[#FF0080] transition-all h-[580px] group`}
+            onClick={() => setCurrentView('roster')} 
+            className="font-bebas text-4xl border-4 border-white px-12 py-3 hover:bg-white hover:text-black transition-all"
           >
-            <PlusCircle className="w-32 h-32 group-hover:scale-110 transition-transform duration-300" />
-            <span className="font-bebas text-6xl mt-12 tracking-tight uppercase">{t('signTalent')}</span>
+            End Stream
           </button>
-          {gameState.roster.map(star => (
-            <div key={star.id} className={`${ThemeStyles.surface} border-[8px] ${ThemeStyles.border} ${ThemeStyles.text} flex flex-col overflow-hidden h-[580px] group transition-all hover:scale-[1.03]`}>
-              <div className="flex-1 bg-black flex items-center justify-center overflow-hidden relative">
-                 <div className="absolute top-6 left-6 z-20 bg-[#00FF7F] text-black px-4 py-2 text-[12px] font-black uppercase tracking-[0.2em] border-2 border-black">SYNC_LIVE</div>
-                 {star.appearance.imageUrl ? (
-                    <img src={star.appearance.imageUrl} alt={star.userName} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
-                 ) : (
-                    <Bot className="w-40 h-40 text-white/10 group-hover:text-[#FF0080]/40 transition-colors" />
-                 )}
+        </header>
+        <main className="flex-1 flex flex-col items-center justify-center p-10 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-5 pointer-events-none">
+             <div className="h-full w-full bg-[radial-gradient(circle_at_center,_var(--magenta)_0%,_transparent_70%)] animate-pulse" />
+          </div>
+          <div className="z-10 text-center space-y-20 max-w-4xl">
+            <div className="space-y-6">
+              <span className="text-xl font-bold tracking-[0.6em] text-[#00FF7F] uppercase">{activeStar.profile.role}</span>
+              <h2 className="font-bebas text-[14rem] leading-none tracking-tighter uppercase">{activeStar.profile.name}</h2>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-40">
+              <div className="flex flex-col items-center">
+                <span className="text-xs font-bold opacity-40 uppercase tracking-[0.4em] mb-4">Network Load</span>
+                <span className="font-bebas text-8xl">92.8%</span>
               </div>
-              <div className={`p-10 border-t-8 ${ThemeStyles.border} flex justify-between items-center bg-inherit`}>
-                 <div className="flex flex-col gap-2">
-                    <h3 className="text-5xl font-bebas leading-none tracking-tight uppercase group-hover:text-[#FF0080] transition-colors">{star.userName}</h3>
-                    <span className="text-[12px] font-black uppercase opacity-60 tracking-[0.3em]">{star.role}</span>
-                 </div>
-                 <button className="p-5 border-4 border-current hover:bg-[#FFFF00] hover:text-black transition-all hover:scale-110 active:scale-95">
-                    <Cast className="w-8 h-8" />
-                 </button>
+              <div className="flex flex-col items-center">
+                <span className="text-xs font-bold opacity-40 uppercase tracking-[0.4em] mb-4">Session Yield</span>
+                <span className="font-bebas text-8xl text-[#00FF7F]">$5.00</span>
               </div>
             </div>
-          ))}
+
+            <div className="flex flex-col items-center gap-8">
+               <div className="w-[600px] h-4 bg-white/10 border-2 border-white/20 relative">
+                  <div className="h-full bg-[#00FF7F] transition-all duration-1000" style={{ width: `${progress}%` }} />
+               </div>
+               <div className="flex flex-col items-center gap-2">
+                 <span className="font-bebas text-5xl tracking-widest">{minutes}:{seconds.toString().padStart(2, '0')}</span>
+                 <span className="text-[10px] font-bold tracking-[0.5em] opacity-40 uppercase">Next Reward Distribution</span>
+               </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (currentView === 'login') {
+    return (
+      <div className={`min-h-screen ${ThemeStyles.bg} ${ThemeStyles.text} flex flex-col font-mono`}>
+        <Nav />
+        <main className="flex-1 flex items-center justify-center p-10">
+          <div className={`${ThemeStyles.bg} border-8 ${ThemeStyles.border} p-20 max-w-2xl w-full flex flex-col gap-12 animate-in fade-in duration-500`}>
+            <div className="border-b-4 border-current pb-10 space-y-4">
+              <h2 className="font-bebas text-[8rem] tracking-tighter uppercase leading-none">{t('identitySync')}</h2>
+              <span className="text-xs font-bold tracking-[0.4em] uppercase opacity-40">Accessing Node 3.4 // Global Terminal</span>
+            </div>
+            
+            <div className="space-y-6">
+              <span className="text-xs font-bold uppercase tracking-widest opacity-40">Producer UID</span>
+              <input 
+                value={gameState.currentProducer}
+                onChange={(e) => setGameState(p => ({...p, currentProducer: e.target.value}))}
+                className={`w-full p-10 text-6xl font-bebas border-4 ${ThemeStyles.border} bg-zinc-100 dark:bg-zinc-800 outline-none focus:border-[#FF0080] tracking-widest`}
+              />
+            </div>
+
+            <button 
+              onClick={() => {
+                localStorage.setItem('myTVStar_isLoggedIn', 'true');
+                setCurrentView('roster');
+              }}
+              className={`w-full py-12 font-bebas text-6xl border-4 ${ThemeStyles.border} ${ThemeStyles.accent} hover:bg-[#FF0080] hover:text-white transition-all`}
+            >
+              {t('enterTerminal')}
+            </button>
+          </div>
         </main>
       </div>
     );
   }
 
   return (
-    <div className="fixed bottom-12 right-12 z-[300] flex flex-col items-end gap-8 pointer-events-none">
+    <div className="fixed bottom-12 right-12 z-[300] pointer-events-none">
        {showPayoutToast && (
-          <div className={`bg-[#00FF7F] border-[10px] border-black p-10 font-bebas text-5xl text-black animate-in slide-in-from-right-20 pointer-events-auto flex items-center gap-8 shadow-[0_0_50px_rgba(0,255,127,0.3)]`}>
-             <div className="p-4 bg-black text-[#00FF7F] border-4 border-white"><DollarSign className="w-12 h-12" /></div>
-             {payoutMessage}
+          <div className="bg-[#00FF7F] border-8 border-black p-12 font-bebas text-6xl text-black flex items-center gap-10 animate-in slide-in-from-right-10 pointer-events-auto">
+             <CheckCircle2 className="w-16 h-16" />
+             <div className="flex flex-col">
+               <span className="leading-none">{payoutMessage}</span>
+               <span className="text-xl font-bold tracking-widest mt-2 uppercase opacity-60">Network Wallet Updated</span>
+             </div>
           </div>
        )}
-       {selectedTier && (
-             <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/95 p-6 backdrop-blur-sm pointer-events-auto">
-                <div className={`${ThemeStyles.surface} border-[12px] ${ThemeStyles.border} p-12 max-w-4xl w-full space-y-8 animate-in zoom-in-95 duration-200 overflow-y-auto max-h-screen custom-scrollbar`}>
-                    <div className="flex justify-between items-start border-b-8 border-current pb-8">
-                        <div>
-                            {selectedTier.isCustom ? (
-                                <div className="space-y-2">
-                                    <h3 className="font-bebas text-6xl text-[#FF0080]">{t('customAmount')}</h3>
-                                    <div className="relative">
-                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 font-bebas text-4xl opacity-50">$</div>
-                                        <input 
-                                            autoFocus
-                                            type="number"
-                                            placeholder="0.00"
-                                            value={customAmountInput}
-                                            onChange={(e) => setCustomAmountInput(e.target.value)}
-                                            className={`w-full border-4 ${ThemeStyles.border} p-6 pl-12 text-5xl font-bebas bg-slate-100 dark:bg-slate-800 text-current outline-none focus:border-[#00FF7F]`}
-                                        />
-                                    </div>
-                                </div>
-                            ) : (
-                                <>
-                                    <h3 className="font-bebas text-7xl text-[#FF0080]">{selectedTier.amount}</h3>
-                                    <span className="text-sm font-black uppercase tracking-widest opacity-50">{selectedTier.label}</span>
-                                </>
-                            )}
-                        </div>
-                        <button onClick={() => { setSelectedTier(null); setCustomAmountInput(''); }} className="p-4 bg-red-600 text-white border-4 border-black hover:bg-black transition-colors">
-                            <X className="w-10 h-10" />
-                        </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center bg-black/5 p-8 border-4 border-dashed border-current">
-                        <div className="space-y-6">
-                            <div className="flex flex-col gap-1">
-                                <span className="text-[10px] font-black uppercase opacity-60">PAYPAL ACCOUNT</span>
-                                <div className="font-bebas text-3xl text-blue-600 underline">dhea_wasisto@yahoo.com</div>
-                            </div>
-                            <div className="flex flex-col gap-1">
-                                <span className="text-[10px] font-black uppercase opacity-60">BANK JAGO ACCOUNT</span>
-                                <div className="font-bebas text-4xl text-orange-600 font-bold">107863277869</div>
-                            </div>
-                            <div className="flex flex-col gap-1">
-                                <span className="text-[10px] font-black uppercase opacity-60">E-WALLET / MOBILE</span>
-                                <div className="font-bebas text-3xl text-[#00FF7F] tracking-widest">+628567239000</div>
-                                <span className="text-[10px] opacity-70">GOPAY / OVO / DANA</span>
-                            </div>
-                        </div>
-                        <div className="flex flex-col items-center bg-black p-8 border-4 border-white">
-                             <div className="w-48 h-48 bg-white p-2 grid grid-cols-10 grid-rows-10 gap-px">
-                                {Array.from({length: 100}).map((_, i) => (
-                                    <div key={i} className={`bg-black ${Math.random() > 0.4 ? 'opacity-100' : 'opacity-10'}`} />
-                                ))}
-                             </div>
-                             <span className="text-[#00FF7F] text-[9px] font-black uppercase mt-5 text-center tracking-widest">SCAN UNIVERSAL QR GATEWAY</span>
-                        </div>
-                    </div>
-
-                    <button 
-                        disabled={isProcessingPayment || (selectedTier.isCustom && (!customAmountInput || parseFloat(customAmountInput) <= 0))}
-                        onClick={() => {
-                            setIsProcessingPayment(true);
-                            announce(t('processing'));
-                            const finalAmount = selectedTier.isCustom ? `${parseFloat(customAmountInput).toFixed(2)} USD` : selectedTier.amount;
-                            setTimeout(() => {
-                                setPayoutMessage(`CONTRIBUTION LOGGED: ${finalAmount}`);
-                                setShowPayoutToast(true);
-                                setSelectedTier(null);
-                                setCustomAmountInput('');
-                                setIsProcessingPayment(false);
-                                announce(t('thankYou'));
-                                setTimeout(() => setShowPayoutToast(false), 5000);
-                            }, 2500);
-                        }}
-                        className={`w-full btn-flat py-12 ${ThemeStyles.accentBg} ${ThemeStyles.accentBtnText} text-6xl font-bebas border-8 ${ThemeStyles.border} hover:bg-[#00FF7F] hover:text-black transition-all disabled:opacity-50`}
-                    >
-                        {isProcessingPayment ? t('processing') : t('confirmPayment')}
-                    </button>
-                    <div className="text-center text-[11px] font-black opacity-40 uppercase tracking-[0.2em]">
-                       UNIVERSAL BROADCAST SYNC // LOCAL CURRENCIES SUPPORTED
-                    </div>
-                </div>
-             </div>
-         )}
     </div>
   );
 };
